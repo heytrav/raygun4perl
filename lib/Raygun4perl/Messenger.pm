@@ -4,6 +4,7 @@ use Mouse;
 
 use LWP::UserAgent;
 use URI;
+use Mozilla::CA;
 
 
 =head1 NAME
@@ -50,7 +51,9 @@ has user_agent => (
     is	    => 'ro',
     isa 	=> 'LWP::UserAgent',
     default => sub {
-        return LWP::UserAgent->new();
+        return LWP::UserAgent->new(
+            ssl_opts => {SSL_ca_file => Mozilla::CA::SSL_ca_file()}
+        );
     },
 );
 
@@ -65,7 +68,8 @@ sub post_to_raygun {
     my ($self, $args) = @_;
     my $uri = $self->api_endpoint;
     my $ua = $self->user_agent;
-    my $response = $ua->post($uri, );
+    my $api_key = $self->api_key;
+    my $response = $ua->post($uri, 'X-ApiKey' => $api_key, Content => [] );
     return $response;
 
 }
