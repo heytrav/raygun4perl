@@ -22,7 +22,7 @@ sub t0010_form_raygun_message : Test(2) {
     my $message;
     lives_ok {
         $message = Raygun4perl::Message->new(
-            occurred_on => '2014-06-27T03:15:10',
+            occurred_on => '2014-06-27T03:15:10+1300',
         );
     }
     'Instantiated Message object.';

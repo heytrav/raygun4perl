@@ -101,10 +101,17 @@ subtype 'MessageError' => as 'HashRef' => where {
 
 subtype 'OccurredOnDateTime' => as 'Object' =>  where {
     $_->isa('DateTime');
-} => message { '"occurred on" must be a valid date: YYYY-MM-DDTHH:MM:SS' };
+};
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
-    my $parser = DateTime::Format::Strptime->new( pattern => '%FT%T' );
+    my $parser = DateTime::Format::Strptime->new( 
+        pattern => '%FT%T%z' ,
+        time_zone => 'UTC',
+        on_error => sub {
+           confess 'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
+        }
+        
+    );
     return $parser->parse_datetime($_);
 };
 
