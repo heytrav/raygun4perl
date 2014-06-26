@@ -2,6 +2,10 @@ package Raygun4perl::Message;
 
 use Mouse;
 
+use DateTime;
+use DateTime::Format::Strptime;
+
+use Mouse::Util::TypeConstraints;
 
 =head1 NAME
 
@@ -11,8 +15,8 @@ Raygun4perl::Message - A message to be sent to raygun.io
 
   use Raygun4perl::Message;
 
-  # something like this (note keys in camel case to facilitate JSON
-  # conversion):
+
+  # The Raygun.io API expects something like this:
   my $data = {
         'occurredOn' => string,
         'details'    => {
@@ -77,7 +81,7 @@ Raygun4perl::Message - A message to be sent to raygun.io
                 'identifier' => string
             }
         }
-    } ;
+    };
 
 =head1 DESCRIPTION
 
@@ -87,6 +91,49 @@ Raygun4perl::Message - A message to be sent to raygun.io
 =head1 INTERFACE
 
 =cut
+
+subtype 'MessageError' => as 'HashRef' where {
+    my $stack_trace  = $_->{stackTrace};
+    my $stack_trace_type = ref $stack_trace;
+    return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
+    return unless @{$stack_trace};
+} => message { "Error should have at least one stack trace." };
+
+subtype 'OccurredOnDateTime' => as 'Object' where {
+    $_->isa('DateTime');
+} => message { '"occurred on" must be a valid date: YYYY-MM-DDTHH:MM:SS' };
+
+coerce 'OccurredOnDateTime' => from 'Str' => via {
+    my $parser = DateTime::Strptime::Formatter->new( pattern => '%FT%T' );
+    return $parser->parse;
+};
+
+has occurred_on => (
+    is      => 'rw',
+    isa     => 'OccurredOnDateTime',
+    coerce  => 1,
+    default => sub {
+        return DateTime->now( time_zone => 'UTC' );
+    },
+);
+
+
+has error => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub {
+    },
+);
+
+=head2 _generate_message
+
+Internal method which converts a Perl hash to JSON.
+
+=cut
+
+sub _generate_message {
+    my ( $self, $raw ) = @_;
+}
 
 =head1 DEPENDENCIES
 
