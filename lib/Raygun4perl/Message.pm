@@ -121,9 +121,6 @@ has occurred_on => (
 has error => (
     is      => 'rw',
     isa     => 'MessageError',
-    default => sub {
-        return {};
-    },
 );
 
 =head2 _generate_message

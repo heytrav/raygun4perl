@@ -17,16 +17,17 @@ sub prep001_message_available : Test(startup => 1) {
       or $self->FAIL_ALL("Message class not available.");
 }
 
-sub t0010_form_raygun_message : Test(3) {
+sub t0010_form_raygun_message : Test(2) {
     my $self = shift;
     my $message;
     lives_ok {
-        $message =
-          Raygun4perl::Message->new( occurred_on => '2014-06-27T03:15:10' );
+        $message = Raygun4perl::Message->new(
+            occurred_on => '2014-06-27T03:15:10',
+        );
     }
     'Instantiated Message object.';
     my $occurred_on = $message->occurred_on;
-    isa_ok( $occurred_on, 'DateTime', 'Correct object' );
+    isa_ok( $occurred_on, 'DateTime', 'Occurred on argument' );
 
 }
 
