@@ -92,20 +92,20 @@ Raygun4perl::Message - A message to be sent to raygun.io
 
 =cut
 
-subtype 'MessageError' => as 'HashRef' where {
+subtype 'MessageError' => as 'HashRef' => where {
     my $stack_trace  = $_->{stackTrace};
     my $stack_trace_type = ref $stack_trace;
     return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
     return unless @{$stack_trace};
 } => message { "Error should have at least one stack trace." };
 
-subtype 'OccurredOnDateTime' => as 'Object' where {
+subtype 'OccurredOnDateTime' => as 'Object' =>  where {
     $_->isa('DateTime');
 } => message { '"occurred on" must be a valid date: YYYY-MM-DDTHH:MM:SS' };
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
-    my $parser = DateTime::Strptime::Formatter->new( pattern => '%FT%T' );
-    return $parser->parse;
+    my $parser = DateTime::Format::Strptime->new( pattern => '%FT%T' );
+    return $parser->parse_datetime($_);
 };
 
 has occurred_on => (
@@ -122,6 +122,7 @@ has error => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub {
+        return {};
     },
 );
 
