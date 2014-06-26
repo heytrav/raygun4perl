@@ -97,7 +97,8 @@ subtype 'MessageError' => as 'HashRef' => where {
     my $stack_trace_type = ref $stack_trace;
     return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
     return unless @{$stack_trace};
-} => message { "Error should have at least one stack trace." };
+    return unless defined $stack_trace->[0]->{lineNumber};
+} => message { "Error should have at least one stack trace with a set line number." };
 
 subtype 'OccurredOnDateTime' => as 'Object' =>  where {
     $_->isa('DateTime');
@@ -110,7 +111,6 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
         on_error => sub {
            confess 'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
         }
-        
     );
     return $parser->parse_datetime($_);
 };
