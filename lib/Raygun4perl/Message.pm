@@ -93,23 +93,29 @@ Raygun4perl::Message - A message to be sent to raygun.io
 =cut
 
 subtype 'MessageError' => as 'HashRef' => where {
-    my $stack_trace  = $_->{stackTrace};
+    my $error = $_;
+    my $stack_trace      = $error->{stackTrace};
     my $stack_trace_type = ref $stack_trace;
     return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
     return unless @{$stack_trace};
     return unless defined $stack_trace->[0]->{lineNumber};
-} => message { "Error should have at least one stack trace with a set line number." };
+    my @error_keys =  qw/innerError data className message/;
+    map { $error->{$_} //= '' } @error_keys;
+} => message {
+    "Error should have at least one stack trace with a set line number.";
+};
 
-subtype 'OccurredOnDateTime' => as 'Object' =>  where {
+subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
 };
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
-    my $parser = DateTime::Format::Strptime->new( 
-        pattern => '%FT%T%z' ,
+    my $parser = DateTime::Format::Strptime->new(
+        pattern   => '%FT%T%z',
         time_zone => 'UTC',
-        on_error => sub {
-           confess 'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
+        on_error  => sub {
+            confess
+              'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
         }
     );
     return $parser->parse_datetime($_);
@@ -124,11 +130,20 @@ has occurred_on => (
     },
 );
 
-
 has error => (
-    is      => 'rw',
-    isa     => 'MessageError',
+    is  => 'rw',
+    isa => 'MessageError',
 );
+
+has user => (
+    is	    => 'rw',
+    isa 	=> 'Str',
+    default => sub {
+        return $ENV{'RAYGUN_API_USER'} // '';
+    }
+);
+
+
 
 =head2 _generate_message
 
@@ -137,7 +152,21 @@ Internal method which converts a Perl hash to JSON.
 =cut
 
 sub _generate_message {
-    my ( $self, $raw ) = @_;
+    my $self = shift;
+    my $formatter = DateTime::Format::Strptime->new(
+        pattern => '%FT%TZ',
+        time_zone => 'UTC',
+    );
+    my $occurred_on = $formatter->format_datetime($self->occurred_on);
+    my $data = {
+        user => {
+            identifier => $self->user
+        },
+        context => {
+            identifier => undef
+        }
+    };
+
 }
 
 =head1 DEPENDENCIES
