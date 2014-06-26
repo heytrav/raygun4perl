@@ -65,7 +65,7 @@ Send data to api.raygun.io/entries via a POST request.
 =cut
 
 sub post_to_raygun {
-    my ($self, $args) = @_;
+    my ($self, $message) = @_;
     my $uri = $self->api_endpoint;
     my $ua = $self->user_agent;
     my $api_key = $self->api_key;
