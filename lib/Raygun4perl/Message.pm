@@ -120,7 +120,7 @@ has occurred_on => (
 
 has error => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => 'MessageError',
     default => sub {
         return {};
     },
