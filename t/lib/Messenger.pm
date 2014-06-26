@@ -1,4 +1,4 @@
-package Test;
+package Messenger;
 
 use strict;
 use warnings;

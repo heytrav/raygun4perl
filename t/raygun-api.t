@@ -2,5 +2,5 @@
 
 use lib qw{ ./t/lib };
 
-use Test;
-Test->runtests;
+use Messenger;
+Messenger->runtests;
