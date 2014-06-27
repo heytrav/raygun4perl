@@ -117,7 +117,7 @@ subtype 'Request' => as 'Object' => where {
 };
 
 subtype 'Environment' => as 'Object' => where {
-    $_->isa('')
+    $_->isa('Raygun4perl::Message::Environment');
 };
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
@@ -149,6 +149,11 @@ coerce 'Request' => from 'Object' => via {
             query_string => $_->uri->query,
         );
     }
+};
+
+coerce 'Environment' => from 'HashRef' => via {
+    # hope that all the arguments are correct.
+    return Raygun4perl::Message::Environment->new(%{$_});
 };
 
 has occurred_on => (
@@ -183,6 +188,9 @@ has environment => (
     is	    => 'rw',
     isa 	=> 'Environment',
     coerce => 1,
+    default => sub {
+        return {};
+    }
 );
 
 
