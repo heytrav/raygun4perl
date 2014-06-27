@@ -10,7 +10,7 @@ use Test::Deep;    # (); # uncomment to stop prototype errors
 use Test::Exception;
 
 use HTTP::Request;
-use Smart::Comments;
+#use Smart::Comments;
 
 sub prep001_messenger_available : Test(startup => 2) {
     my $self = shift;

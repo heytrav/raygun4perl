@@ -7,7 +7,7 @@ use URI;
 use Mozilla::CA;
 use JSON;
 
-use Smart::Comments;
+#use Smart::Comments;
 
 =head1 NAME
 
