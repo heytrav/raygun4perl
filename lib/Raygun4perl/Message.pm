@@ -116,6 +116,10 @@ subtype 'Request' => as 'Object' => where {
     $_->isa('Raygun4perl::Message::Request');
 };
 
+subtype 'Environment' => as 'Object' => where {
+    $_->isa('')
+};
+
 coerce 'OccurredOnDateTime' => from 'Str' => via {
     my $parser = DateTime::Format::Strptime->new(
         pattern   => '%FT%T%z',
