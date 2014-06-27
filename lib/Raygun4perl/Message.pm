@@ -193,6 +193,57 @@ has environment => (
     }
 );
 
+has user_custom_data => (
+    is	    => 'rw',
+    isa 	=> 'HashRef',
+    default => sub {
+        return {};
+    },
+);
+
+has tags => (
+    is	    => 'rw',
+    isa 	=> 'ArrayRef',
+    default => sub {
+        return [];
+    },
+);
+
+has client => (
+    is	    => 'rw',
+    isa 	=> 'HashRef',
+    default => sub {
+        return {};
+    },
+);
+
+has version => (
+    is	    => 'rw',
+    isa 	=> 'Str',
+    default => sub {
+        return '0.1';
+    },
+);
+
+has machine_name => (
+    is	    => 'rw',
+    isa 	=> 'Str',
+    default => sub {
+        return 'Test';
+    },
+    # other attributes
+);
+
+
+
+
+
+
+
+
+
+
+
 
 
 =head2 _generate_message
@@ -209,11 +260,17 @@ sub _generate_message {
     );
     my $occurred_on = $formatter->format_datetime( $self->occurred_on );
     my $data        = {
-        user => {
-            identifier => $self->user
-        },
-        context => {
-            identifier => undef
+        ocurredOn => $ocurred_on,
+        userCustomData => $self->user_custom_data,
+        details => {
+            request => $self->request->prepare_for_api,
+            environment => $self->environment->prepare_for_api,
+            user => {
+                identifier => $self->user
+            },
+            context => {
+                identifier => undef
+            }
         }
     };
 
