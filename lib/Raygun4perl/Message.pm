@@ -141,6 +141,7 @@ coerce 'Request' => from 'Object' => via {
             method       => $_->method,
             raw_data     => $_->as_string,
             headers      => $headers,
+            http_method => $_->method,
             query_string => $query_string,
         );
     }
@@ -233,13 +234,13 @@ has machine_name => (
     },
 );
 
-=head2 ready_weapons
+=head2 arm_the_laser
 
-Internal method which converts a Perl hash to JSON.
+Internal method which converts a Perl hash to JSON .
 
 =cut
 
-sub ready_weapons {
+sub arm_the_laser {
     my $self      = shift;
     my $formatter = DateTime::Format::Strptime->new(
         pattern   => '%FT%TZ',
@@ -247,15 +248,15 @@ sub ready_weapons {
     );
     my $occurred_on = $formatter->format_datetime( $self->occurred_on );
     my $data        = {
-        ocurredOn => $occurred_on,
-        userCustomData => $self->user_custom_data,
+        occurredOn => $occurred_on,
         details => {
+            userCustomData => $self->user_custom_data,
             machineName => $self->machine_name,
-            error => $self->error->ready_weapons,
+            error => $self->error->arm_the_laser,
             version => $self->version,
             client => $self->client,
-            request => $self->request->ready_weapons,
-            environment => $self->environment->ready_weapons,
+            request => $self->request->arm_the_laser,
+            environment => $self->environment->arm_the_laser,
             user => {
                 identifier => $self->user
             },

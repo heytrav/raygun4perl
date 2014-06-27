@@ -21,15 +21,14 @@ sub prep001_messenger_available : Test(startup => 2) {
 
 }
 
-sub t0010_raygun_http_403_response : Test(3) {
+sub t0010_raygun_http_403_response : Test(2) {
     my $self = shift;
     my $messenger = Raygun4perl::Messenger->new( api_key => '' );
     my $result;
     lives_ok {
-        $result = $messenger->raygun_attack( {} );
+        $result = $messenger->fire_the_laser( {} );
     }
     'Called Raygun.io';
-    ### result : $result
     cmp_ok( $result->code, '==', 403, 'Expect a "Bad Request" error.' );
 }
 
@@ -43,7 +42,7 @@ sub t0020_raygun_http_400_response : Test(2) {
     my $messenger = Raygun4perl::Messenger->new( api_key => $self->{api_key} );
     my $result;
     lives_ok {
-        $result = $messenger->raygun_attack( {} );
+        $result = $messenger->fire_the_laser( {} );
     }
     'Called Raygun.io';
 
@@ -55,12 +54,12 @@ sub t0030_raygun_http_ok : Test(2) {
     my $self    = shift;
     my $api_key = $self->{api_key};
     my $message = Raygun4perl::Message->new(
+        user => 'null@null.com',
         client => {
             name      => 'something',
             version   => 2,
             clientUrl => 'www.null.com'
         },
-        occurred_on => '2014-06-27T03:15:10+1300',
         error       => {
             stack_trace => [ { line_number => 34 } ]
         },
@@ -77,16 +76,16 @@ sub t0030_raygun_http_ok : Test(2) {
 
     );
 
-    my $ready_weapons = $message->prepare_for_api;
+    my $arm_the_laser = $message->arm_the_laser;
     my $messenger = Raygun4perl::Messenger->new( api_key => $self->{api_key} );
     my $response;
     lives_ok {
-        $response = $messenger->raygun_attack($ready_weapons);
+        $response = $messenger->fire_the_laser($arm_the_laser);
     }
     'Request worked ok';
+    ### response : $response
     cmp_ok( $response->code, '<', 400, 'Expect OK response.' );
 
-    ### response : $response
 
 }
 

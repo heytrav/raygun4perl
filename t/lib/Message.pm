@@ -88,7 +88,7 @@ sub t0030_validate_environment : Test(3) {
         'Raygun4perl::Message::Environment',
         'HashRef intantiated correct environment'
     );
-    my $api_data = $environment->ready_weapons;
+    my $api_data = $environment->arm_the_laser;
     cmp_deeply(
         $api_data,
         superhashof(
@@ -120,8 +120,10 @@ sub t0040_validate_request : Test(2) {
         'Raygun4perl::Message::Request',
         'Request attribute is expected type'
     );
+    
 
-    my $data = $request->ready_weapons;
+    my $data = $request->arm_the_laser;
+    ### data : $data
 }
 
 sub t0050_generate_entire_message : Test(1) {
@@ -148,7 +150,7 @@ sub t0050_generate_entire_message : Test(1) {
         ),
     );
 
-    my $ready_for_raygun = $message->ready_weapons;
+    my $ready_for_raygun = $message->arm_the_laser;
     ### result : $ready_for_raygun
     cmp_deeply(
         $ready_for_raygun,

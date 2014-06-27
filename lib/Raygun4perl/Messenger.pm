@@ -5,6 +5,9 @@ use Mouse;
 use LWP::UserAgent;
 use URI;
 use Mozilla::CA;
+use JSON;
+
+use Smart::Comments;
 
 =head1 NAME
 
@@ -22,8 +25,6 @@ Raygun4perl::Messenger - Communicate with the Raygun.io endpoint.
 
 # longer description...
 #
-
-
 
 =head1 INTERFACE
 
@@ -52,19 +53,28 @@ has user_agent => (
     },
 );
 
-=head2 raygun_attack
+=head2 fire_the_laser
 
 Send data to api.raygun.io/entries via a POST request.
 
 =cut
 
-sub raygun_attack {
+sub fire_the_laser {
     my ( $self, $message ) = @_;
     my $uri     = $self->api_endpoint;
     my $ua      = $self->user_agent;
     my $api_key = $self->api_key;
-    my $response =
-      $ua->post( $uri, 'X-ApiKey' => $api_key, Content => [ %{$message} ] );
+    my $json = JSON->new->allow_nonref;
+    my $jsoned =$json->pretty->encode($message);
+    my $req = HTTP::Request->new(POST => $uri);
+    $req->header('Content-Type' => 'application/json');
+    $req->header('X-ApiKey' => $api_key);
+    $req->content($jsoned);
+    ### json message : $jsoned;
+    my $response = $ua->request($req);
+
+    #my $response =
+      #$ua->post( $uri, 'X-ApiKey' => $api_key, Content => [ $jsoned ] );
     return $response;
 
 }

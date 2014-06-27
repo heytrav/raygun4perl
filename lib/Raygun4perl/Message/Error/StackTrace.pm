@@ -54,13 +54,13 @@ has method_name => (
     },
 );
 
-=head2 ready_weapons
+=head2 arm_the_laser
 
 Prepare the data for conversion to JSON.
 
 =cut
 
-sub ready_weapons {
+sub arm_the_laser {
     my $self = shift;
     return {
         lineNumber => $self->line_number,

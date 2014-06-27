@@ -21,7 +21,7 @@ Raygun4perl::Message::Environment - Represent the I<Environment> data in a raygu
 
 The environment data is all optional and may be left blank. This class just
 initialises them with empty strings or 1s or 0s depending on the context. The
-L<ready_weapons> method may be called to retreive the structure in a form
+L<arm_the_laser> method may be called to retreive the structure in a form
 that can be converted directly to JSON.
 
 
@@ -29,9 +29,46 @@ that can be converted directly to JSON.
 
 =cut
 
+use Filesys::DfPortable;
+use Sys::Info;
+use Sys::Info::OS;
+use POSIX ();
+
+has info => (
+    is      => 'ro',
+    isa     => 'Sys::Info',
+    default => sub {
+        return Sys::Info->new;
+    },
+);
+
+has info_os => (
+    is      => 'rw',
+    isa     => 'Sys::Info::OS',
+    default => sub {
+        return Sys::Info::OS->new();
+    },
+);
+
 has processor_count =>
   ( is => 'rw', isa => 'Int', default => sub { return 1; } );
-has os_version => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
+has os_version => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->info->os->name( long => 1 );
+    }
+);
+has fs => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub {
+        return dfportable( "/", 1024 );
+    },
+);
+
 has window_bounds_width =>
   ( is => 'rw', isa => 'Int', default => sub { return 0; } );
 has window_bounds_height =>
@@ -40,14 +77,42 @@ has resolution_scale =>
   ( is => 'rw', isa => 'Str', default => sub { return ''; } );
 has current_orientation =>
   ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has cpu => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
+has cpu => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->info->device("CPU")->identify;
+    }
+);
 has package_version =>
   ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has architecture => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has total_physical_memory =>
-  ( is => 'rw', isa => 'Int', default => sub { return 1; } );
-has available_physical_memory =>
-  ( is => 'rw', isa => 'Int', default => sub { return 0; } );
+has architecture => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => sub {
+        return (POSIX::uname)[4];
+    }
+);
+has total_physical_memory => (
+    is      => 'rw',
+    isa     => 'Int',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->fs->{blocks};
+    }
+);
+has available_physical_memory => (
+    is      => 'rw',
+    isa     => 'Int',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->fs->{bfree};
+    }
+);
 has total_virtual_memory =>
   ( is => 'rw', isa => 'Int', default => sub { return 0; } );
 has available_virtual_memory =>
@@ -55,15 +120,23 @@ has available_virtual_memory =>
 has disk_space_free =>
   ( is => 'rw', isa => 'ArrayRef', default => sub { return [] }, );
 has device_name => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has locale      => ( is => 'rw', isa => 'Str', default => sub { return '' }, );
+has locale => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->info_os->locale;
+    },
+);
 
-=head2 ready_weapons
+=head2 arm_the_laser
 
 Return the data structure that will be sent to raygun.io
 
 =cut
 
-sub ready_weapons {
+sub arm_the_laser {
     my $self = shift;
     return {
         processorCount          => $self->processor_count,

@@ -79,13 +79,13 @@ has headers => (
     },
 );
 
-=head2 ready_weapons
+=head2 arm_the_laser
 
 Return the data structure that will be sent to raygun.io.
 
 =cut
 
-sub ready_weapons {
+sub arm_the_laser {
     my $self = shift;
     return {
         ipAddress   => $self->ip_address,
