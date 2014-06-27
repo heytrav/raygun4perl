@@ -21,7 +21,7 @@ Raygun4perl::Message::Environment - Represent the I<Environment> data in a raygu
 
 The environment data is all optional and may be left blank. This class just
 initialises them with empty strings or 1s or 0s depending on the context. The
-L<prepare_for_api> method may be called to retreive the structure in a form
+L<ready_weapons> method may be called to retreive the structure in a form
 that can be converted directly to JSON.
 
 
@@ -57,13 +57,13 @@ has disk_space_free =>
 has device_name => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
 has locale      => ( is => 'rw', isa => 'Str', default => sub { return '' }, );
 
-=head2 prepare_for_api
+=head2 ready_weapons
 
 Return the data structure that will be sent to raygun.io
 
 =cut
 
-sub prepare_for_api {
+sub ready_weapons {
     my $self = shift;
     return {
         processorCount          => $self->processor_count,

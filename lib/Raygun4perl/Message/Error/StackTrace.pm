@@ -54,13 +54,13 @@ has method_name => (
     },
 );
 
-=head2 prepare_for_api
+=head2 ready_weapons
 
 Prepare the data for conversion to JSON.
 
 =cut
 
-sub prepare_for_api {
+sub ready_weapons {
     my $self = shift;
     return {
         lineNumber => $self->line_number,

@@ -88,7 +88,7 @@ sub t0030_validate_environment : Test(3) {
         'Raygun4perl::Message::Environment',
         'HashRef intantiated correct environment'
     );
-    my $api_data = $environment->prepare_for_api;
+    my $api_data = $environment->ready_weapons;
     cmp_deeply(
         $api_data,
         superhashof(
@@ -103,23 +103,60 @@ sub t0030_validate_environment : Test(3) {
     );
 }
 
-sub t0040_validate_request :Test(2) {
-    my $self = shift;
-    my $request = HTTP::Request->new(POST => 'https://www.null.com', ['Content-Type' => 'text/html',]);
+sub t0040_validate_request : Test(2) {
+    my $self    = shift;
+    my $request = HTTP::Request->new(
+        POST => 'https://www.null.com',
+        [ 'Content-Type' => 'text/html', ]
+    );
     my $message;
     lives_ok {
-     $message = Raygun4perl::Message->new( request => $request );
+        $message = Raygun4perl::Message->new( request => $request );
     }
     'Set the request field';
-    my $request = $message->request;
-    isa_ok($request, 'Raygun4perl::Message::Request', 'Request attribute is expected type');
+     $request = $message->request;
+    isa_ok(
+        $request,
+        'Raygun4perl::Message::Request',
+        'Request attribute is expected type'
+    );
 
-    my $data = $request->prepare_for_api;
-    ### data : $data
-
-
+    my $data = $request->ready_weapons;
 }
 
+sub t0050_generate_entire_message : Test(1) {
+    my $self    = shift;
+    my $message = Raygun4perl::Message->new(
+        client => {
+            name => 'something',
+            version => 2,
+            clientUrl => 'www.null.com'
+        },
+        occurred_on => '2014-06-27T03:15:10+1300',
+        error       => {
+            stack_trace => [ { line_number => 34 } ]
+        },
+        environment => {
+            processor_count       => 2,
+            cpu                   => 34,
+            architecture          => 'x84',
+            total_physical_memory => 3
+        },
+        request => HTTP::Request->new(
+            POST => 'https://www.null.com',
+            [ 'Content-Type' => 'text/html', ]
+        ),
+    );
+
+    my $ready_for_raygun = $message->ready_weapons;
+    ### result : $ready_for_raygun
+    cmp_deeply(
+        $ready_for_raygun,
+        superhashof( {} ),
+        'We got something at least'
+    );
+
+}
 
 1;
 

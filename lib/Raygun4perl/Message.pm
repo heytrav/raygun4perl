@@ -233,13 +233,13 @@ has machine_name => (
     },
 );
 
-=head2 prepare_for_api
+=head2 ready_weapons
 
 Internal method which converts a Perl hash to JSON.
 
 =cut
 
-sub prepare_for_api {
+sub ready_weapons {
     my $self      = shift;
     my $formatter = DateTime::Format::Strptime->new(
         pattern   => '%FT%TZ',
@@ -251,11 +251,11 @@ sub prepare_for_api {
         userCustomData => $self->user_custom_data,
         details => {
             machineName => $self->machine_name,
-            error => $self->error->prepare_for_api,
+            error => $self->error->ready_weapons,
             version => $self->version,
             client => $self->client,
-            request => $self->request->prepare_for_api,
-            environment => $self->environment->prepare_for_api,
+            request => $self->request->ready_weapons,
+            environment => $self->environment->ready_weapons,
             user => {
                 identifier => $self->user
             },
