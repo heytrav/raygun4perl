@@ -1,15 +1,15 @@
-package Raygun4perl::Message::Environment;
+package WebService::Raygun::Message::Environment;
 
 use Mouse;
 
 =head1 NAME
 
-Raygun4perl::Message::Environment - Represent the I<Environment> data in a raygun request.
+WebService::Raygun::Message::Environment - Represent the I<Environment> data in a raygun request.
 
 =head1 SYNOPSIS
 
-  use Raygun4perl::Message::Environment;
-  my $environment = Raygun4perl::Message::Environment->new(
+  use WebService::Raygun::Message::Environment;
+  my $environment = WebService::Raygun::Message::Environment->new(
     processor_count       => 2,
     cpu                   => 34,
     architecture          => 'x84',

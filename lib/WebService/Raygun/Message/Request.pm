@@ -1,15 +1,15 @@
-package Raygun4perl::Message::Request;
+package WebService::Raygun::Message::Request;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
 
 =head1 NAME
 
-Raygun4perl::Message::Request - Encapsulate the data in a typical HTTP request.
+WebService::Raygun::Message::Request - Encapsulate the data in a typical HTTP request.
 
 =head1 SYNOPSIS
 
-  use Raygun4perl::Message::Request;
+  use WebService::Raygun::Message::Request;
 
   # synopsis...
 

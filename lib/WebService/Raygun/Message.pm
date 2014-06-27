@@ -1,4 +1,4 @@
-package Raygun4perl::Message;
+package WebService::Raygun::Message;
 
 use Mouse;
 
@@ -10,11 +10,11 @@ use Mouse::Util::TypeConstraints;
 
 =head1 NAME
 
-Raygun4perl::Message - A message to be sent to raygun.io
+WebService::Raygun::Message - A message to be sent to raygun.io
 
 =head1 SYNOPSIS
 
-  use Raygun4perl::Message;
+  use WebService::Raygun::Message;
 
 
   # The Raygun.io API expects something like this:
@@ -92,13 +92,13 @@ This module assembles a request for raygun.io.
 
 =cut
 
-use Raygun4perl::Message::Error;
-use Raygun4perl::Message::Request;
-use Raygun4perl::Message::Environment;
+use WebService::Raygun::Message::Error;
+use WebService::Raygun::Message::Request;
+use WebService::Raygun::Message::Environment;
 
 
 subtype 'MessageError' => as 'Object' => where {
-    $_->isa('Raygun4perl::Message::Error');
+    $_->isa('WebService::Raygun::Message::Error');
 };
 
 subtype 'OccurredOnDateTime' => as 'Object' => where {
@@ -106,11 +106,11 @@ subtype 'OccurredOnDateTime' => as 'Object' => where {
 };
 
 subtype 'Request' => as 'Object' => where {
-    $_->isa('Raygun4perl::Message::Request');
+    $_->isa('WebService::Raygun::Message::Request');
 };
 
 subtype 'Environment' => as 'Object' => where {
-    $_->isa('Raygun4perl::Message::Environment');
+    $_->isa('WebService::Raygun::Message::Environment');
 };
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
@@ -135,7 +135,7 @@ coerce 'Request' => from 'Object' => via {
         }
         my $query_string = $_->uri->query || '';
 
-        return Raygun4perl::Message::Request->new(
+        return WebService::Raygun::Message::Request->new(
             url          => $_->uri->as_string,
             method       => $_->method,
             raw_data     => $_->as_string,
@@ -148,11 +148,11 @@ coerce 'Request' => from 'Object' => via {
 
 coerce 'Environment' => from 'HashRef' => via {
     # hope that all the arguments are correct.
-    return Raygun4perl::Message::Environment->new(%{$_});
+    return WebService::Raygun::Message::Environment->new(%{$_});
 };
 
 coerce 'MessageError' => from 'HashRef' => via {
-    return Raygun4perl::Message::Error->new(%{$_});
+    return WebService::Raygun::Message::Error->new(%{$_});
 };
 
 has occurred_on => (

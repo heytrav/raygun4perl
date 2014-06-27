@@ -1,4 +1,4 @@
-package Raygun4perl::Messenger;
+package WebService::Raygun::Messenger;
 
 use Mouse;
 
@@ -11,14 +11,14 @@ use JSON;
 
 =head1 NAME
 
-Raygun4perl::Messenger - Communicate with the Raygun.io endpoint.
+WebService::Raygun::Messenger - Communicate with the Raygun.io endpoint.
 
 =head1 SYNOPSIS
 
-  use Raygun4perl::Messenger;
+  use WebService::Raygun::Messenger;
 
-  my $raygun = Raygun4perl::Messenger->new(api_key => 'your key here');
-  my $response = $raygun->fire_the_laser($raygun_message);
+  my $raygun = WebService::Raygun::Messenger->new(api_key => 'your key here');
+  my $response = $raygun->fire_raygun($raygun_message);
   # $response->status == ?
 
 =head1 DESCRIPTION
@@ -52,13 +52,13 @@ has user_agent => (
     },
 );
 
-=head2 fire_the_laser
+=head2 fire_raygun
 
 Send data to api.raygun.io/entries via a POST request.
 
 =cut
 
-sub fire_the_laser {
+sub fire_raygun {
     my ( $self, $message ) = @_;
     my $uri     = $self->api_endpoint;
     my $ua      = $self->user_agent;

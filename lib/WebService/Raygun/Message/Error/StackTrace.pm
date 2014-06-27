@@ -1,14 +1,14 @@
-package Raygun4perl::Message::Error::StackTrace;
+package WebService::Raygun::Message::Error::StackTrace;
 
 use Mouse;
 
 =head1 NAME
 
-Raygun4perl::Message::Error::StackTrace - Encapsule the stacktrace in error details
+WebService::Raygun::Message::Error::StackTrace - Encapsule the stacktrace in error details
 
 =head1 SYNOPSIS
 
-  use Raygun4perl::Message::Error::StackTrace;
+  use WebService::Raygun::Message::Error::StackTrace;
 
 
 

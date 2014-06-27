@@ -1,16 +1,16 @@
-package Raygun4perl;
+package WebService::Raygun;
 
 
 =head1 NAME
 
-Raygun4perl - Connect to the Raygun.io API
+WebService::Raygun - Connect to the Raygun.io API
 
 =head1 SYNOPSIS
 
-  use Raygun4perl::Message;
-  use Raygun4perl::Messenger;
+  use WebService::Raygun::Message;
+  use WebService::Raygun::Messenger;
 
-    my $message = Raygun4perl::Message->new(
+    my $message = WebService::Raygun::Message->new(
         user => 'null@null.com',
         client => {
             name      => 'something',
@@ -34,8 +34,8 @@ Raygun4perl - Connect to the Raygun.io API
     );
 
     my $message = $message->arm_the_laser;
-    my $raygun = Raygun4perl::Messenger->new( api_key => '<your raygun.io api key>' );
-    my $response = $raygun->fire_the_laser($message);
+    my $raygun = WebService::Raygun::Messenger->new( api_key => '<your raygun.io api key>' );
+    my $response = $raygun->fire_raygun($message);
 
 =head1 DESCRIPTION
 
@@ -173,37 +173,37 @@ checks C<$ENV{RAYGUN_API_KEY}>.
 
 =over 2
 
-=item L<Raygun4perl::Messenger|Raygun4perl::Messenger>
+=item L<WebService::Raygun::Messenger|WebService::Raygun::Messenger>
 
 =back
 
 =over 2
 
-=item L<Raygun4perl::Message|Raygun4perl::Message>
+=item L<WebService::Raygun::Message|WebService::Raygun::Message>
 
 =back
 
 =over 2
 
-=item L<Raygun4perl::Message::Request|Raygun4perl::Message::Request>
+=item L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>
 
 =back
 
 =over 2
 
-=item L<Raygun4perl::Message::Environment|Raygun4perl::Message::Environment>
+=item L<WebService::Raygun::Message::Environment|WebService::Raygun::Message::Environment>
 
 =back
 
 =over 2
 
-=item L<Raygun4perl::Message::Error|Raygun4perl::Message::Error>
+=item L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>
 
 =back
 
 =over 2
 
-=item L<Raygun4perl::Message::Error::StackTrace|Raygun4perl::Message::Error::StackTrace>
+=item L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace>
 
 =back
 

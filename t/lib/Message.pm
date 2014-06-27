@@ -15,7 +15,7 @@ use HTTP::Request;
 
 sub prep001_message_available : Test(startup => 1) {
     my $self = shift;
-    use_ok('Raygun4perl::Message')
+    use_ok('WebService::Raygun::Message')
       or $self->FAIL_ALL("Message class not available.");
 }
 
@@ -24,7 +24,7 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
     my $message;
     lives_ok {
         $message =
-          Raygun4perl::Message->new( occurred_on => '2014-06-27T03:15:10+1300',
+          WebService::Raygun::Message->new( occurred_on => '2014-06-27T03:15:10+1300',
           );
     }
     'Instantiated Message object.';
@@ -33,7 +33,7 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
 
     throws_ok {
         $message =
-          Raygun4perl::Message->new( occurred_on => '2014-06-27T03:15:10+200',
+          WebService::Raygun::Message->new( occurred_on => '2014-06-27T03:15:10+200',
           );
     }
     qr{yyyy-mm-ddTHH:MM:SS\+HH},
@@ -44,7 +44,7 @@ sub t0020_validate_error_field : Test(4) {
     my $self = shift;
     my $message;
     lives_ok {
-        $message = Raygun4perl::Message->new(
+        $message = WebService::Raygun::Message->new(
             error => {
                 stack_trace => [ { line_number => 34 } ]
             }
@@ -52,14 +52,14 @@ sub t0020_validate_error_field : Test(4) {
     }
     'Instantiated Message object.';
     my $error = $message->error;
-    isa_ok( $error, 'Raygun4perl::Message::Error', 'Error is an error type' );
+    isa_ok( $error, 'WebService::Raygun::Message::Error', 'Error is an error type' );
     isa_ok(
         $error->stack_trace->[0],
-        'Raygun4perl::Message::Error::StackTrace',
+        'WebService::Raygun::Message::Error::StackTrace',
         'Stack trace is the correct type.'
     );
     throws_ok {
-        Raygun4perl::Message->new(
+        WebService::Raygun::Message->new(
             error => {
                 stackTrace => [ {} ]
             }
@@ -70,7 +70,7 @@ sub t0020_validate_error_field : Test(4) {
 
 sub t0030_validate_environment : Test(3) {
     my $self    = shift;
-    my $message = Raygun4perl::Message->new();
+    my $message = WebService::Raygun::Message->new();
     lives_ok {
         $message->environment(
             {
@@ -85,7 +85,7 @@ sub t0030_validate_environment : Test(3) {
     my $environment = $message->environment;
     isa_ok(
         $environment,
-        'Raygun4perl::Message::Environment',
+        'WebService::Raygun::Message::Environment',
         'HashRef intantiated correct environment'
     );
     my $api_data = $environment->arm_the_laser;
@@ -111,13 +111,13 @@ sub t0040_validate_request : Test(2) {
     );
     my $message;
     lives_ok {
-        $message = Raygun4perl::Message->new( request => $request );
+        $message = WebService::Raygun::Message->new( request => $request );
     }
     'Set the request field';
      $request = $message->request;
     isa_ok(
         $request,
-        'Raygun4perl::Message::Request',
+        'WebService::Raygun::Message::Request',
         'Request attribute is expected type'
     );
     
@@ -128,7 +128,7 @@ sub t0040_validate_request : Test(2) {
 
 sub t0050_generate_entire_message : Test(1) {
     my $self    = shift;
-    my $message = Raygun4perl::Message->new(
+    my $message = WebService::Raygun::Message->new(
         client => {
             name => 'something',
             version => 2,

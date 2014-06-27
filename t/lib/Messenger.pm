@@ -14,19 +14,19 @@ use HTTP::Request;
 
 sub prep001_messenger_available : Test(startup => 2) {
     my $self = shift;
-    use_ok('Raygun4perl::Messenger')
+    use_ok('WebService::Raygun::Messenger')
       or $self->FAIL_ALL('Messenger class not available.');
-    use_ok('Raygun4perl::Message')
+    use_ok('WebService::Raygun::Message')
       or $self->FAIL_ALL('Message class not available.');
 
 }
 
 sub t0010_raygun_http_403_response : Test(2) {
     my $self = shift;
-    my $messenger = Raygun4perl::Messenger->new( api_key => '' );
+    my $messenger = WebService::Raygun::Messenger->new( api_key => '' );
     my $result;
     lives_ok {
-        $result = $messenger->fire_the_laser( {} );
+        $result = $messenger->fire_raygun( {} );
     }
     'Called Raygun.io';
     cmp_ok( $result->code, '==', 403, 'Expect a "Bad Request" error.' );
@@ -39,10 +39,10 @@ sub t0020_raygun_http_400_response : Test(2) {
         $self->SKIP_ALL('No API key for Raygun.io. No point in continuing.');
     }
     $self->{api_key} = $api_key;
-    my $messenger = Raygun4perl::Messenger->new( api_key => $self->{api_key} );
+    my $messenger = WebService::Raygun::Messenger->new( api_key => $self->{api_key} );
     my $result;
     lives_ok {
-        $result = $messenger->fire_the_laser( {} );
+        $result = $messenger->fire_raygun( {} );
     }
     'Called Raygun.io';
 
@@ -53,7 +53,7 @@ sub t0020_raygun_http_400_response : Test(2) {
 sub t0030_raygun_http_ok : Test(2) {
     my $self    = shift;
     my $api_key = $self->{api_key};
-    my $message = Raygun4perl::Message->new(
+    my $message = WebService::Raygun::Message->new(
         user => 'null@null.com',
         client => {
             name      => 'something',
@@ -77,10 +77,10 @@ sub t0030_raygun_http_ok : Test(2) {
     );
 
     my $arm_the_laser = $message->arm_the_laser;
-    my $messenger = Raygun4perl::Messenger->new( api_key => $self->{api_key} );
+    my $messenger = WebService::Raygun::Messenger->new( api_key => $self->{api_key} );
     my $response;
     lives_ok {
-        $response = $messenger->fire_the_laser($arm_the_laser);
+        $response = $messenger->fire_raygun($arm_the_laser);
     }
     'Request worked ok';
     ### response : $response
