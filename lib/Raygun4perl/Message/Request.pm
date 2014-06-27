@@ -52,11 +52,17 @@ has http_method => (
 has ip_address => (
     is  => 'rw',
     isa => 'Str',
+    default => sub {
+        return '127.0.0.1';
+    }
 );
 
 has query_string => (
     is  => 'rw',
     isa => 'Str',
+    default => sub {
+        return '';
+    }
 );
 
 has raw_data => (
@@ -87,7 +93,7 @@ sub prepare_for_api {
         #ipAddress => undef,
         #hostName => undef,
         url => $self->url,
-        httpMethod => $self->method,
+        httpMethod => $self->http_method,
         queryString => $self->query_string,
         headers => $self->headers,
         rawData => $self->raw_data,

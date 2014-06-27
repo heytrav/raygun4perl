@@ -100,18 +100,7 @@ use Raygun4perl::Message::Environment;
 
 subtype 'MessageError' => as 'Object' => where {
     $_->isa('Raygun4perl::Message::Error');
-    #my $error            = $_;
-    #my $stack_trace      = $error->{stackTrace};
-    #my $stack_trace_type = ref $stack_trace;
-    #return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
-    #return unless @{$stack_trace};
-    #return unless defined $stack_trace->[0]->{lineNumber};
-    #my @error_keys = qw/innerError data className message/;
-    #map { $error->{$_} //= '' } @error_keys;
 };
-#=> message {
-    #"Error should have at least one stack trace with a set line number.";
-#};
 
 subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
@@ -145,13 +134,14 @@ coerce 'Request' => from 'Object' => via {
             my $value = $_->header($header);
             $headers->{$header} = $value;
         }
+        my $query_string = $_->uri->query || '';
 
         return Raygun4perl::Message::Request->new(
             url          => $_->uri->as_string,
             method       => $_->method,
             raw_data     => $_->as_string,
             headers      => $headers,
-            query_string => $_->uri->query,
+            query_string => $query_string,
         );
     }
 };
@@ -243,13 +233,13 @@ has machine_name => (
     },
 );
 
-=head2 _generate_message
+=head2 prepare_for_api
 
 Internal method which converts a Perl hash to JSON.
 
 =cut
 
-sub _generate_message {
+sub prepare_for_api {
     my $self      = shift;
     my $formatter = DateTime::Format::Strptime->new(
         pattern   => '%FT%TZ',

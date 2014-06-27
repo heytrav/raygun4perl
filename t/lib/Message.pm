@@ -9,6 +9,8 @@ use Test::More;
 use Test::Deep;    # (); # uncomment to stop prototype errors
 use Test::Exception;
 
+use HTTP::Request;
+
 use Smart::Comments;
 
 sub prep001_message_available : Test(startup => 1) {
@@ -38,7 +40,7 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
       'Timestamp in incorrect format throws an error.';
 }
 
-sub t0020_validate_line_number : Test(4) {
+sub t0020_validate_error_field : Test(4) {
     my $self = shift;
     my $message;
     lives_ok {
@@ -99,8 +101,25 @@ sub t0030_validate_environment : Test(3) {
         ),
         'Received expected data for API'
     );
+}
+
+sub t0040_validate_request :Test(2) {
+    my $self = shift;
+    my $request = HTTP::Request->new(POST => 'https://www.null.com', ['Content-Type' => 'text/html',]);
+    my $message;
+    lives_ok {
+     $message = Raygun4perl::Message->new( request => $request );
+    }
+    'Set the request field';
+    my $request = $message->request;
+    isa_ok($request, 'Raygun4perl::Message::Request', 'Request attribute is expected type');
+
+    my $data = $request->prepare_for_api;
+    ### data : $data
+
 
 }
+
 
 1;
 
