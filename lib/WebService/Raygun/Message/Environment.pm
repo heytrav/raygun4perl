@@ -21,7 +21,7 @@ WebService::Raygun::Message::Environment - Represent the I<Environment> data in 
 
 The environment data is all optional and may be left blank. This class just
 initialises them with empty strings or 1s or 0s depending on the context. The
-L<arm_the_laser> method may be called to retreive the structure in a form
+L<prepare_raygun> method may be called to retreive the structure in a form
 that can be converted directly to JSON.
 
 
@@ -130,13 +130,13 @@ has locale => (
     },
 );
 
-=head2 arm_the_laser
+=head2 prepare_raygun
 
 Return the data structure that will be sent to raygun.io
 
 =cut
 
-sub arm_the_laser {
+sub prepare_raygun {
     my $self = shift;
     return {
         processorCount          => $self->processor_count,

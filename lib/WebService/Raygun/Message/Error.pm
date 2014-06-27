@@ -83,20 +83,20 @@ has stack_trace => (
     # other attributes
 );
 
-=head2 arm_the_laser
+=head2 prepare_raygun
 
 Prepare the error structure to be converted to JSON and sent to raygun.io.
 
 =cut
 
-sub arm_the_laser {
+sub prepare_raygun {
     my $self = shift;
     return {
         innerError => $self->inner_error,
         data       => $self->data,
         className  => $self->class_name,
         message    => $self->message,
-        stackTrace => [ map { $_->arm_the_laser } @{ $self->stack_trace } ]
+        stackTrace => [ map { $_->prepare_raygun } @{ $self->stack_trace } ]
     };
 }
 

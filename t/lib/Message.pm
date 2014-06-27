@@ -88,7 +88,7 @@ sub t0030_validate_environment : Test(3) {
         'WebService::Raygun::Message::Environment',
         'HashRef intantiated correct environment'
     );
-    my $api_data = $environment->arm_the_laser;
+    my $api_data = $environment->prepare_raygun;
     cmp_deeply(
         $api_data,
         superhashof(
@@ -122,7 +122,7 @@ sub t0040_validate_request : Test(2) {
     );
     
 
-    my $data = $request->arm_the_laser;
+    my $data = $request->prepare_raygun;
     ### data : $data
 }
 
@@ -150,7 +150,7 @@ sub t0050_generate_entire_message : Test(1) {
         ),
     );
 
-    my $ready_for_raygun = $message->arm_the_laser;
+    my $ready_for_raygun = $message->prepare_raygun;
     ### result : $ready_for_raygun
     cmp_deeply(
         $ready_for_raygun,

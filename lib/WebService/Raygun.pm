@@ -33,7 +33,7 @@ WebService::Raygun - Connect to the Raygun.io API
 
     );
 
-    my $message = $message->arm_the_laser;
+    my $message = $message->prepare_raygun;
     my $raygun = WebService::Raygun::Messenger->new( api_key => '<your raygun.io api key>' );
     my $response = $raygun->fire_raygun($message);
 

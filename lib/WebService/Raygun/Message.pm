@@ -233,13 +233,13 @@ has machine_name => (
     },
 );
 
-=head2 arm_the_laser
+=head2 prepare_raygun
 
 Internal method which converts a Perl hash to JSON .
 
 =cut
 
-sub arm_the_laser {
+sub prepare_raygun {
     my $self      = shift;
     my $formatter = DateTime::Format::Strptime->new(
         pattern   => '%FT%TZ',
@@ -251,11 +251,11 @@ sub arm_the_laser {
         details => {
             userCustomData => $self->user_custom_data,
             machineName => $self->machine_name,
-            error => $self->error->arm_the_laser,
+            error => $self->error->prepare_raygun,
             version => $self->version,
             client => $self->client,
-            request => $self->request->arm_the_laser,
-            environment => $self->environment->arm_the_laser,
+            request => $self->request->prepare_raygun,
+            environment => $self->environment->prepare_raygun,
             user => {
                 identifier => $self->user
             },
