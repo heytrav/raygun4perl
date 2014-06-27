@@ -8,9 +8,6 @@ use HTTP::Request;
 
 use Mouse::Util::TypeConstraints;
 
-use Raygun4perl::Message::Request;
-use Raygun4perl::Message::Environment;
-
 =head1 NAME
 
 Raygun4perl::Message - A message to be sent to raygun.io
@@ -96,18 +93,25 @@ Raygun4perl::Message - A message to be sent to raygun.io
 
 =cut
 
-subtype 'MessageError' => as 'HashRef' => where {
-    my $error            = $_;
-    my $stack_trace      = $error->{stackTrace};
-    my $stack_trace_type = ref $stack_trace;
-    return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
-    return unless @{$stack_trace};
-    return unless defined $stack_trace->[0]->{lineNumber};
-    my @error_keys = qw/innerError data className message/;
-    map { $error->{$_} //= '' } @error_keys;
-} => message {
-    "Error should have at least one stack trace with a set line number.";
+use Raygun4perl::Message::Error;
+use Raygun4perl::Message::Request;
+use Raygun4perl::Message::Environment;
+
+
+subtype 'MessageError' => as 'Object' => where {
+    $_->isa('Raygun4perl::Message::Error');
+    #my $error            = $_;
+    #my $stack_trace      = $error->{stackTrace};
+    #my $stack_trace_type = ref $stack_trace;
+    #return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
+    #return unless @{$stack_trace};
+    #return unless defined $stack_trace->[0]->{lineNumber};
+    #my @error_keys = qw/innerError data className message/;
+    #map { $error->{$_} //= '' } @error_keys;
 };
+#=> message {
+    #"Error should have at least one stack trace with a set line number.";
+#};
 
 subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
@@ -157,6 +161,10 @@ coerce 'Environment' => from 'HashRef' => via {
     return Raygun4perl::Message::Environment->new(%{$_});
 };
 
+coerce 'MessageError' => from 'HashRef' => via {
+    return Raygun4perl::Message::Error->new(%{$_});
+};
+
 has occurred_on => (
     is      => 'rw',
     isa     => 'OccurredOnDateTime',
@@ -169,6 +177,7 @@ has occurred_on => (
 has error => (
     is  => 'rw',
     isa => 'MessageError',
+    coerce => 1,
 );
 
 has user => (
@@ -251,8 +260,8 @@ sub _generate_message {
         ocurredOn => $occurred_on,
         userCustomData => $self->user_custom_data,
         details => {
-            error => $self->error->prepare_for_api,
             machineName => $self->machine_name,
+            error => $self->error->prepare_for_api,
             version => $self->version,
             client => $self->client,
             request => $self->request->prepare_for_api,

@@ -38,16 +38,21 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
       'Timestamp in incorrect format throws an error.';
 }
 
-sub t0020_validate_line_number : Test(2) {
+sub t0020_validate_line_number : Test(4) {
     my $self = shift;
+    my $message ;
     lives_ok {
-        Raygun4perl::Message->new(
+        $message = Raygun4perl::Message->new(
             error => {
-                stackTrace => [ { lineNumber => 34 } ]
+                stack_trace => [ { line_number => 34 } ]
             }
         );
     }
     'Instantiated Message object.';
+    my $error = $message->error;
+    isa_ok($error, 'Raygun4perl::Message::Error', 'Error is an error type');
+    isa_ok($error->stack_trace->[0], 'Raygun4perl::Message::Error::StackTrace', 
+    'Stack trace is the correct type.');
     throws_ok {
         Raygun4perl::Message->new(
             error => {
