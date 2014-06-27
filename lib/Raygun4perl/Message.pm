@@ -9,6 +9,7 @@ use HTTP::Request;
 use Mouse::Util::TypeConstraints;
 
 use Raygun4perl::Message::Request;
+use Raygun4perl::Message::Environment;
 
 =head1 NAME
 
@@ -231,20 +232,7 @@ has machine_name => (
     default => sub {
         return 'Test';
     },
-    # other attributes
 );
-
-
-
-
-
-
-
-
-
-
-
-
 
 =head2 _generate_message
 
@@ -260,9 +248,13 @@ sub _generate_message {
     );
     my $occurred_on = $formatter->format_datetime( $self->occurred_on );
     my $data        = {
-        ocurredOn => $ocurred_on,
+        ocurredOn => $occurred_on,
         userCustomData => $self->user_custom_data,
         details => {
+            error => $self->error->prepare_for_api,
+            machineName => $self->machine_name,
+            version => $self->version,
+            client => $self->client,
             request => $self->request->prepare_for_api,
             environment => $self->environment->prepare_for_api,
             user => {
@@ -273,7 +265,7 @@ sub _generate_message {
             }
         }
     };
-
+    return $data;
 }
 
 =head1 DEPENDENCIES

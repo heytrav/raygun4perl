@@ -58,6 +58,42 @@ sub t0020_validate_line_number : Test(2) {
     qr{one\sstack\strace}, 'Error thrown as expected.';
 }
 
+sub t0030_validate_environment : Test(3) {
+    my $self    = shift;
+    my $message = Raygun4perl::Message->new();
+    lives_ok {
+        $message->environment(
+            {
+                processor_count       => 2,
+                cpu                   => 34,
+                architecture          => 'x84',
+                total_physical_memory => 3
+            }
+        );
+    }
+    'Set some environment fields';
+    my $environment = $message->environment;
+    isa_ok(
+        $environment,
+        'Raygun4perl::Message::Environment',
+        'HashRef intantiated correct environment'
+    );
+    my $api_data = $environment->prepare_for_api;
+    cmp_deeply(
+        $api_data,
+        superhashof(
+            {
+                processorCount      => 2,
+                cpu                 => 34,
+                architecture        => 'x84',
+                totalPhysicalMemory => 3
+            }
+        ),
+        'Received expected data for API'
+    );
+
+}
+
 1;
 
 __END__

@@ -37,7 +37,7 @@ has package_version =>
   ( is => 'rw', isa => 'Str', default => sub { return ''; } );
 has architecture => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
 has total_physical_memory =>
-  ( is => 'rw', isa => 'Int', default => sub { return ''; } );
+  ( is => 'rw', isa => 'Int', default => sub { return 1; } );
 has available_physical_memory =>
   ( is => 'rw', isa => 'Int', default => sub { return 0; } );
 has total_virtual_memory =>
@@ -47,7 +47,7 @@ has available_virtual_memory =>
 has disk_space_free =>
   ( is => 'rw', isa => 'ArrayRef', default => sub { return [] }, );
 has device_name => ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has locale      => ( is => 'rw', isa => 'Str', default => sub { }, );
+has locale      => ( is => 'rw', isa => 'Str', default => sub { return '' }, );
 
 =head2 prepare_for_api
 
