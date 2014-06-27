@@ -2,10 +2,6 @@ package WebService::Raygun::Messenger;
 
 use Mouse;
 
-use LWP::UserAgent;
-use URI;
-use Mozilla::CA;
-use JSON;
 
 #use Smart::Comments;
 
@@ -29,6 +25,27 @@ Send a request to raygun.io.
 
 =cut
 
+=head2 api_key
+
+Your raygun.io API key. By default, this will be whatever is in the
+RAYGUN_API_KEY environment variable.
+
+=cut
+
+use LWP::UserAgent;
+use URI;
+use Mozilla::CA;
+use JSON;
+use Mouse::Util::TypeConstraints;
+
+subtype 'RaygunMessage' => as 'Object' => where {
+    $_->isa('WebService::Raygun::Message');
+};
+
+coerce 'RaygunMessage' => from 'HashRef' => via {
+    return WebService::Raygun::Message->new(%{$_});
+};
+
 has api_key => (
     is       => 'rw',
     isa      => 'Str',
@@ -51,6 +68,13 @@ has user_agent => (
             ssl_opts => { SSL_ca_file => Mozilla::CA::SSL_ca_file() } );
     },
 );
+
+has message => (
+    is	    => 'rw',
+    isa 	=> 'RaygunMessage',
+    coerce => 1,
+);
+
 
 =head2 fire_raygun
 
