@@ -50,16 +50,16 @@ has http_method => (
 );
 
 has ip_address => (
-    is  => 'rw',
-    isa => 'Str',
+    is      => 'rw',
+    isa     => 'Str',
     default => sub {
         return '127.0.0.1';
     }
 );
 
 has query_string => (
-    is  => 'rw',
-    isa => 'Str',
+    is      => 'rw',
+    isa     => 'Str',
     default => sub {
         return '';
     }
@@ -72,14 +72,12 @@ has raw_data => (
 );
 
 has headers => (
-    is	    => 'rw',
-    isa 	=> 'HashRef',
+    is      => 'rw',
+    isa     => 'HashRef',
     default => sub {
         return {};
     },
 );
-
-
 
 =head2 prepare_for_api
 
@@ -90,13 +88,13 @@ Return the data structure that will be sent to raygun.io.
 sub prepare_for_api {
     my $self = shift;
     return {
-        #ipAddress => undef,
-        #hostName => undef,
-        url => $self->url,
-        httpMethod => $self->http_method,
+        ipAddress   => $self->ip_address,
+        hostName    => $self->host_name,
+        url         => $self->url,
+        httpMethod  => $self->http_method,
         queryString => $self->query_string,
-        headers => $self->headers,
-        rawData => $self->raw_data,
+        headers     => $self->headers,
+        rawData     => $self->raw_data,
     };
 }
 
