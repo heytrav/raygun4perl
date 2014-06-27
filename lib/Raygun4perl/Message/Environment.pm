@@ -9,12 +9,20 @@ Raygun4perl::Message::Environment - Represent the I<Environment> data in a raygu
 =head1 SYNOPSIS
 
   use Raygun4perl::Message::Environment;
+  my $environment = Raygun4perl::Message::Environment->new(
+    processor_count       => 2,
+    cpu                   => 34,
+    architecture          => 'x84',
+    total_physical_memory => 3
+  );
 
-  # synopsis...
 
 =head1 DESCRIPTION
 
-# longer description...
+The environment data is all optional and may be left blank. This class just
+initialises them with empty strings or 1s or 0s depending on the context. The
+L<prepare_for_api> method may be called to retreive the structure in a form
+that can be converted directly to JSON.
 
 
 =head1 INTERFACE
