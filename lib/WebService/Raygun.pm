@@ -1,6 +1,5 @@
 package WebService::Raygun;
 
-
 =head1 NAME
 
 WebService::Raygun - Connect to the Raygun.io API
@@ -10,6 +9,7 @@ WebService::Raygun - Connect to the Raygun.io API
   use WebService::Raygun::Message;
   use WebService::Raygun::Messenger;
 
+   # see WebService::Raygun::Message for details of request object.
     my $message = WebService::Raygun::Message->new(
         user => 'null@null.com',
         client => {
@@ -18,19 +18,22 @@ WebService::Raygun - Connect to the Raygun.io API
             clientUrl => 'www.null.com'
         },
         error       => {
-            stack_trace => [ { line_number => 34 } ]
+            stack_trace => [
+                {
+                line_number => 34
+                }
+            ]
         },
         environment => {
-            processor_count       => 2,
-            cpu                   => 34,
-            architecture          => 'x84',
-            total_physical_memory => 3
+            processor_count       => <integer>,
+            cpu                   => <integer>,
+            architecture          => <integer>,
+            total_physical_memory => <integer>
         },
         request => HTTP::Request->new(
             POST => 'https://www.null.com',
             [ 'Content-Type' => 'text/html', ]
         ),
-
     );
 
     my $message = $message->prepare_raygun;
@@ -61,62 +64,62 @@ checks C<$ENV{RAYGUN_API_KEY}>.
 
 =over 2
 
-=item Filesys::DfPortable 
+=item Filesys::DfPortable
 
 =back
 
 =over 2
 
-=item HTTP::Request 
+=item HTTP::Request
 
 =back
 
 =over 2
 
-=item JSON 
+=item JSON
 
 =back
 
 =over 2
 
-=item LWP::UserAgent 
+=item LWP::UserAgent
 
 =back
 
 
 =over 2
 
-=item Mouse 
+=item Mouse
 
 =back
 
 =over 2
 
-=item Mouse::Util::TypeConstraints 
+=item Mouse::Util::TypeConstraints
 
 =back
 
 =over 2
 
-=item Mozilla::CA 
+=item Mozilla::CA
 
 =back
 
 =over 2
 
-=item POSIX 
+=item POSIX
 
 =back
 
 =over 2
 
-=item Sys::Info 
+=item Sys::Info
 
 =back
 
 =over 2
 
-=item Sys::Info::OS 
+=item Sys::Info::OS
 
 =back
 
@@ -128,37 +131,37 @@ checks C<$ENV{RAYGUN_API_KEY}>.
 
 =over 2
 
-=item Test::Class 
+=item Test::Class
 
 =back
 
 =over 2
 
-=item Test::Deep 
+=item Test::Deep
 
 =back
 
 =over 2
 
-=item Test::Exception 
+=item Test::Exception
 
 =back
 
 =over 2
 
-=item Test::More 
+=item Test::More
 
 =back
 
 =over 2
 
-=item parent 
+=item parent
 
 =back
 
 =over 2
 
-=item strict 
+=item strict
 
 =back
 
@@ -180,6 +183,8 @@ checks C<$ENV{RAYGUN_API_KEY}>.
 =over 2
 
 =item L<WebService::Raygun::Message|WebService::Raygun::Message>
+
+Constructs the actual message. See this class for a better description of the fields available or required for the raygun.io API.
 
 =back
 

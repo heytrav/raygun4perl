@@ -2,11 +2,6 @@ package WebService::Raygun::Message;
 
 use Mouse;
 
-use DateTime;
-use DateTime::Format::Strptime;
-use HTTP::Request;
-
-use Mouse::Util::TypeConstraints;
 
 =head1 NAME
 
@@ -19,7 +14,7 @@ WebService::Raygun::Message - A message to be sent to raygun.io
 
   # The Raygun.io API expects something like this:
   my $data = {
-        'occurredOn' => string,
+        'occurredOn' => string, # ISO 8601
         'details'    => {
             'machineName' => string,
             'version'     => string,
@@ -88,10 +83,17 @@ WebService::Raygun::Message - A message to be sent to raygun.io
 
 This module assembles a request for raygun.io.
 
+
 =head1 INTERFACE
 
 =cut
 
+use DateTime;
+use DateTime::Format::Strptime;
+use HTTP::Request;
+use POSIX ();
+
+use Mouse::Util::TypeConstraints;
 use WebService::Raygun::Message::Error;
 use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::Environment;
@@ -155,6 +157,12 @@ coerce 'MessageError' => from 'HashRef' => via {
     return WebService::Raygun::Message::Error->new(%{$_});
 };
 
+=head2 occurred_on
+
+Must be a valid datetime with timezone offset; eg 2014-06-30T04:30:30+100. Defaults to current time.
+
+=cut
+
 has occurred_on => (
     is      => 'rw',
     isa     => 'OccurredOnDateTime',
@@ -164,11 +172,23 @@ has occurred_on => (
     },
 );
 
+=head2 error
+
+See L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>
+
+=cut
+
 has error => (
     is  => 'rw',
     isa => 'MessageError',
     coerce => 1,
 );
+
+=head2 user
+
+Can be an email address or some other identifier. Note that if an email address is used, raygun.io will try to find a suitable Gravatar to display in the results.
+
+=cut
 
 has user => (
     is      => 'rw',
@@ -178,11 +198,28 @@ has user => (
     }
 );
 
+=head2 request
+
+See L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>.
+
+
+=cut
+
+
 has request => (
     is     => 'rw',
     isa    => 'Request',
     coerce => 1,
 );
+
+
+=head2 environment
+
+
+See L<WebService::Raygun::Message::Environment|WebService::Raygun::Message::Environment>.
+
+
+=cut
 
 has environment => (
     is	    => 'rw',
@@ -193,6 +230,13 @@ has environment => (
     }
 );
 
+=head2 user_custom_data
+
+
+
+=cut
+
+
 has user_custom_data => (
     is	    => 'rw',
     isa 	=> 'HashRef',
@@ -200,6 +244,12 @@ has user_custom_data => (
         return {};
     },
 );
+
+=head2 tags
+
+
+=cut
+
 
 has tags => (
     is	    => 'rw',
@@ -209,6 +259,12 @@ has tags => (
     },
 );
 
+
+=head2 client
+
+
+=cut
+
 has client => (
     is	    => 'rw',
     isa 	=> 'HashRef',
@@ -216,6 +272,11 @@ has client => (
         return {};
     },
 );
+
+=head2 version
+
+
+=cut
 
 has version => (
     is	    => 'rw',
@@ -225,17 +286,39 @@ has version => (
     },
 );
 
+=head2 machine_name
+
+
+=cut
+
 has machine_name => (
     is	    => 'rw',
     isa 	=> 'Str',
     default => sub {
-        return 'Test';
+        return (POSIX::uname)[1];
     },
 );
 
+
+=head2 response_status_code
+
+Default is 200.
+
+=cut
+
+has response_status_code => (
+    is	    => 'rw',
+    isa 	=> 'Int',
+    default => sub {
+        return 200;
+    },
+);
+
+
+
 =head2 prepare_raygun
 
-Internal method which converts a Perl hash to JSON .
+Converts a Perl hash to JSON.
 
 =cut
 
@@ -261,6 +344,9 @@ sub prepare_raygun {
             },
             context => {
                 identifier => undef
+            },
+            response => {
+                statusCode => $self->response_status_code,
             }
         }
     };
