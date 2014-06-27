@@ -49,122 +49,122 @@ checks C<$ENV{RAYGUN_API_KEY}>.
 
 =over 2
 
-=item DateTime => 0,
+=item DateTime
 
 =back
 
 =over 2
 
-=item DateTime::Format::Strptime => 0,
+=item DateTime::Format::Strptime
 
 =back
 
 =over 2
 
-=item Filesys::DfPortable => 0,
+=item Filesys::DfPortable 
 
 =back
 
 =over 2
 
-=item HTTP::Request => 0,
+=item HTTP::Request 
 
 =back
 
 =over 2
 
-=item JSON => 0,
+=item JSON 
 
 =back
 
 =over 2
 
-=item LWP::UserAgent => 0,
+=item LWP::UserAgent 
 
 =back
 
 
 =over 2
 
-=item Mouse => 0,
+=item Mouse 
 
 =back
 
 =over 2
 
-=item Mouse::Util::TypeConstraints => 0,
+=item Mouse::Util::TypeConstraints 
 
 =back
 
 =over 2
 
-=item Mozilla::CA => 0,
+=item Mozilla::CA 
 
 =back
 
 =over 2
 
-=item POSIX => 0,
+=item POSIX 
 
 =back
 
 =over 2
 
-=item Sys::Info => 0,
+=item Sys::Info 
 
 =back
 
 =over 2
 
-=item Sys::Info::OS => 0,
+=item Sys::Info::OS 
 
 =back
 
 =over 2
 
-=item URI => 0
+=item URI
 
 =back
 
 =over 2
 
-=item Test::Class => 0,
+=item Test::Class 
 
 =back
 
 =over 2
 
-=item Test::Deep => 0,
+=item Test::Deep 
 
 =back
 
 =over 2
 
-=item Test::Exception => 0,
+=item Test::Exception 
 
 =back
 
 =over 2
 
-=item Test::More => 0,
+=item Test::More 
 
 =back
 
 =over 2
 
-=item parent => 0,
+=item parent 
 
 =back
 
 =over 2
 
-=item strict => 0,
+=item strict 
 
 =back
 
 =over 2
 
-=item warnings => 0
+=item warnings
 
 =back
 
