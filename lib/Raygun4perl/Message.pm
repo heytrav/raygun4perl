@@ -4,8 +4,11 @@ use Mouse;
 
 use DateTime;
 use DateTime::Format::Strptime;
+use HTTP::Request;
 
 use Mouse::Util::TypeConstraints;
+
+use Raygun4perl::Message::Request;
 
 =head1 NAME
 
@@ -93,13 +96,13 @@ Raygun4perl::Message - A message to be sent to raygun.io
 =cut
 
 subtype 'MessageError' => as 'HashRef' => where {
-    my $error = $_;
+    my $error            = $_;
     my $stack_trace      = $error->{stackTrace};
     my $stack_trace_type = ref $stack_trace;
     return unless defined $stack_trace_type and $stack_trace_type eq 'ARRAY';
     return unless @{$stack_trace};
     return unless defined $stack_trace->[0]->{lineNumber};
-    my @error_keys =  qw/innerError data className message/;
+    my @error_keys = qw/innerError data className message/;
     map { $error->{$_} //= '' } @error_keys;
 } => message {
     "Error should have at least one stack trace with a set line number.";
@@ -107,6 +110,10 @@ subtype 'MessageError' => as 'HashRef' => where {
 
 subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
+};
+
+subtype 'Request' => as 'Object' => where {
+    $_->isa('Raygun4perl::Message::Request');
 };
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
@@ -119,6 +126,25 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
         }
     );
     return $parser->parse_datetime($_);
+};
+
+coerce 'Request' => from 'Object' => via {
+    if ($_->isa('HTTP::Request')) {
+        my @header_names = $_->header_field_names;
+        my $headers;
+        foreach my $header (@header_names) {
+            my $value = $_->header($header);
+            $headers->{$header} = $value;
+        }
+
+        return Raygun4perl::Message::Request->new(
+            url          => $_->uri->as_string,
+            method       => $_->method,
+            raw_data     => $_->as_string,
+            headers      => $headers,
+            query_string => $_->uri->query,
+        );
+    }
 };
 
 has occurred_on => (
@@ -136,11 +162,23 @@ has error => (
 );
 
 has user => (
-    is	    => 'rw',
-    isa 	=> 'Str',
+    is      => 'rw',
+    isa     => 'Str',
     default => sub {
         return $ENV{'RAYGUN_API_USER'} // '';
     }
+);
+
+has request => (
+    is     => 'rw',
+    isa    => 'Request',
+    coerce => 1,
+);
+
+has environment => (
+    is	    => 'rw',
+    isa 	=> 'Environment',
+    coerce => 1,
 );
 
 
@@ -152,13 +190,13 @@ Internal method which converts a Perl hash to JSON.
 =cut
 
 sub _generate_message {
-    my $self = shift;
+    my $self      = shift;
     my $formatter = DateTime::Format::Strptime->new(
-        pattern => '%FT%TZ',
+        pattern   => '%FT%TZ',
         time_zone => 'UTC',
     );
-    my $occurred_on = $formatter->format_datetime($self->occurred_on);
-    my $data = {
+    my $occurred_on = $formatter->format_datetime( $self->occurred_on );
+    my $data        = {
         user => {
             identifier => $self->user
         },
