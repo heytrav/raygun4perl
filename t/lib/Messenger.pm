@@ -76,11 +76,11 @@ sub t0030_raygun_http_ok : Test(2) {
 
     );
 
-    my $arm_the_laser = $message->arm_the_laser;
+    my $prepare_raygun = $message->prepare_raygun;
     my $messenger = WebService::Raygun::Messenger->new( api_key => $self->{api_key} );
     my $response;
     lives_ok {
-        $response = $messenger->fire_raygun($arm_the_laser);
+        $response = $messenger->fire_raygun($prepare_raygun);
     }
     'Request worked ok';
     ### response : $response
