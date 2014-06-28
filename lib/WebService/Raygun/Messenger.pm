@@ -2,7 +2,6 @@ package WebService::Raygun::Messenger;
 
 use Mouse;
 
-
 #use Smart::Comments;
 
 =head1 NAME
@@ -43,7 +42,7 @@ subtype 'RaygunMessage' => as 'Object' => where {
 };
 
 coerce 'RaygunMessage' => from 'HashRef' => via {
-    return WebService::Raygun::Message->new(%{$_});
+    return WebService::Raygun::Message->new( %{$_} );
 };
 
 has api_key => (
@@ -70,11 +69,10 @@ has user_agent => (
 );
 
 has message => (
-    is	    => 'rw',
-    isa 	=> 'RaygunMessage',
+    is     => 'rw',
+    isa    => 'RaygunMessage',
     coerce => 1,
 );
-
 
 =head2 fire_raygun
 
@@ -83,26 +81,26 @@ Send data to api.raygun.io/entries via a POST request.
 =cut
 
 sub fire_raygun {
-    my ( $self, $message ) = @_;
+    my $self    = shift;
+    my $message = $self->message;
     my $uri     = $self->api_endpoint;
     my $ua      = $self->user_agent;
     my $api_key = $self->api_key;
-    my $json = JSON->new->allow_nonref;
-    my $jsoned =$json->pretty->encode($message);
-    my $req = HTTP::Request->new(POST => $uri);
-    $req->header('Content-Type' => 'application/json');
-    $req->header('X-ApiKey' => $api_key);
+    my $json    = JSON->new->allow_nonref;
+    my $jsoned  = $json->pretty->encode( $message->prepare_raygun );
+    ### json : $jsoned
+    my $req     = HTTP::Request->new( POST => $uri );
+    $req->header( 'Content-Type' => 'application/json' );
+    $req->header( 'X-ApiKey'     => $api_key );
     $req->content($jsoned);
     ### json message : $jsoned;
     my $response = $ua->request($req);
 
     #my $response =
-      #$ua->post( $uri, 'X-ApiKey' => $api_key, Content => [ $jsoned ] );
+    #$ua->post( $uri, 'X-ApiKey' => $api_key, Content => [ $jsoned ] );
     return $response;
 
 }
-
-
 
 1;
 
