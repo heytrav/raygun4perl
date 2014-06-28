@@ -2,9 +2,6 @@ package WebService::Raygun::Message::Error;
 
 use Mouse;
 
-use Mouse::Util::TypeConstraints;
-
-use WebService::Raygun::Message::Error::StackTrace;
 
 =head1 NAME
 
@@ -21,6 +18,9 @@ You shouldn't need to instantiate this class directly.
 =head1 INTERFACE
 
 =cut
+
+use Mouse::Util::TypeConstraints;
+use WebService::Raygun::Message::Error::StackTrace;
 
 subtype 'StackTrace' => as 'Object' =>
   where { $_->isa('WebService::Raygun::Message::Error::StackTrace') };

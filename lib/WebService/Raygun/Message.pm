@@ -124,6 +124,14 @@ subtype 'CatalystRequest' => as 'Object' => where {
     $_->isa('Catalyst::Request');
 };
 
+subtype 'MooseException' => as 'Object' => where {
+    $_->isa('Moose::Exception');
+};
+
+subtype 'MojoException' => as 'Object' => where {
+    $_->isa('Mojo::Exception');
+};
+
 coerce 'OccurredOnDateTime' => from 'Str' => via {
     my $parser = DateTime::Format::Strptime->new(
         pattern   => '%FT%T%z',
@@ -178,23 +186,69 @@ coerce 'Request' => from 'HttpRequest' => via {
     $_->read_chunk( \$chunk, 4096 );
     my $query_string = $_->uri->query || '';
     return WebService::Raygun::Message::Request->new(
-        ip_address  => $_->address,
-        headers     => $headers,
-        http_method => $_->method,
-        host_name   => $_->hostname,
-        raw_data    => $chunk,
+        ip_address   => $_->address,
+        headers      => $headers,
+        http_method  => $_->method,
+        host_name    => $_->hostname,
+        raw_data     => $chunk,
         query_string => $query_string,
     );
 };
 
 coerce 'Environment' => from 'HashRef' => via {
-
-    # hope that all the arguments are correct.
     return WebService::Raygun::Message::Environment->new( %{$_} );
 };
 
 coerce 'MessageError' => from 'HashRef' => via {
     return WebService::Raygun::Message::Error->new( %{$_} );
+} => from 'MooseException' => via {
+    my $trace       = $_->trace;
+    my $stack_trace = [];
+    while ( my $frame = $trace->next_frame ) {
+        push @{$stack_trace},
+          {
+            line_number => $frame->line,
+            class_name  => $frame->package,
+            file_name   => $frame->filename,
+            method_name => $frame->subroutine,
+          };
+    }
+    return WebService::Raygun::Message::Error->new(
+        class_name  => ( ref $_ ),
+        message     => $_->message,
+        stack_trace => $stack_trace,
+    );
+}
+=> from 'MojoException' => via {
+    # Very basic for now since I can't find docs on what the frames look like
+    # in Mojo::Exception.
+    my $stack_trace = [ { line_number => $_->line, } ];
+    return WebService::Raygun::Message::Error->new(
+        class_name  => ( ref $_ ),
+        message     => $_->message,
+        stack_trace => $stack_trace,
+    );
+}
+=> from 'Str' => via {
+    my $error_text = $_;
+    my $exception_regex = qr{
+        ^\s*(?<message> (?: (?! \sat\s [^\s]+ \s line).)*)
+        \sat\s(?<filename> (?: (?! \sline\s\d+).)* )
+        \sline\s(?<line>\d+)[^\d]*$
+    }xsm;
+    my ($message,$stack_trace);
+    while ($error_text =~ /$exception_regex/g ) {
+        $message = $+{message} unless $message;
+        push @{$stack_trace},
+          {
+            line_number => $+{line},
+            file_name   => $+{filename}
+          };
+    }
+    return WebService::Raygun::Message::Error->new(
+        stack_trace => $stack_trace,
+        message     => $message,
+    );
 };
 
 =head2 occurred_on

@@ -24,8 +24,8 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
     my $message;
     lives_ok {
         $message =
-          WebService::Raygun::Message->new( occurred_on => '2014-06-27T03:15:10+1300',
-          );
+          WebService::Raygun::Message->new(
+            occurred_on => '2014-06-27T03:15:10+1300', );
     }
     'Instantiated Message object.';
     my $occurred_on = $message->occurred_on;
@@ -33,8 +33,8 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
 
     throws_ok {
         $message =
-          WebService::Raygun::Message->new( occurred_on => '2014-06-27T03:15:10+200',
-          );
+          WebService::Raygun::Message->new(
+            occurred_on => '2014-06-27T03:15:10+200', );
     }
     qr{yyyy-mm-ddTHH:MM:SS\+HH},
       'Timestamp in incorrect format throws an error.';
@@ -52,7 +52,11 @@ sub t0020_validate_error_field : Test(4) {
     }
     'Instantiated Message object.';
     my $error = $message->error;
-    isa_ok( $error, 'WebService::Raygun::Message::Error', 'Error is an error type' );
+    isa_ok(
+        $error,
+        'WebService::Raygun::Message::Error',
+        'Error is an error type'
+    );
     isa_ok(
         $error->stack_trace->[0],
         'WebService::Raygun::Message::Error::StackTrace',
@@ -66,6 +70,60 @@ sub t0020_validate_error_field : Test(4) {
         );
     }
     qr{one\sstack\strace}, 'Error thrown as expected.';
+}
+
+sub t0021_catch_moose_exception : Test(2) {
+    my $self = shift;
+    eval {
+        package Test::Moose;
+        use Moose;
+        extends;
+    };
+    if ( my $exception = $@ ) {
+        my $message;
+        lives_ok {
+            $message = WebService::Raygun::Message->new( error => $exception );
+        }
+        'Initialised class using Moose exception.';
+        isa_ok(
+            $message->error,
+            'WebService::Raygun::Message::Error',
+            'Created an error object.'
+        );
+    }
+}
+
+sub t0022_catch_mouse_exception : Test(2) {
+    my $self = shift;
+    eval {
+        package Test::Mouse;
+        use Mouse;
+        has something => (
+            is       => 'rw',
+            isa      => 'StupidData',
+            required => 1,
+            default  => sub {
+                return 1;
+            },
+        );
+
+        my $test = Test::Mouse->new;
+    };
+    if ( my $exception = $@ ) {
+        my $error_type = ref $exception;
+
+        ### mouse error : $error_type
+        my $message;
+        lives_ok {
+            $message = WebService::Raygun::Message->new( error => $exception );
+        }
+        'Initialised class using ordinary exception.';
+        isa_ok(
+            $message->error,
+            'WebService::Raygun::Message::Error',
+            'Created an error object.'
+        );
+    }
 }
 
 sub t0030_validate_environment : Test(3) {
@@ -114,13 +172,12 @@ sub t0040_validate_request : Test(2) {
         $message = WebService::Raygun::Message->new( request => $request );
     }
     'Set the request field';
-     $request = $message->request;
+    $request = $message->request;
     isa_ok(
         $request,
         'WebService::Raygun::Message::Request',
         'Request attribute is expected type'
     );
-    
 
     my $data = $request->prepare_raygun;
     ### data : $data
@@ -130,8 +187,8 @@ sub t0050_generate_entire_message : Test(1) {
     my $self    = shift;
     my $message = WebService::Raygun::Message->new(
         client => {
-            name => 'something',
-            version => 2,
+            name      => 'something',
+            version   => 2,
             clientUrl => 'www.null.com'
         },
         occurred_on => '2014-06-27T03:15:10+1300',
