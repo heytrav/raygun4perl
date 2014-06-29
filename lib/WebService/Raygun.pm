@@ -6,39 +6,39 @@ WebService::Raygun - Connect to the Raygun.io API
 
 =head1 SYNOPSIS
 
-  use WebService::Raygun::Message;
   use WebService::Raygun::Messenger;
 
-   # see WebService::Raygun::Message for details of request object.
-    my $message = WebService::Raygun::Message->new(
-        user => 'null@null.com',
-        client => {
-            name      => 'something',
-            version   => 2,
-            clientUrl => 'www.null.com'
-        },
-        error       => {
-            stack_trace => [
-                {
-                line_number => 34
-                }
-            ]
-        },
-        environment => {
-            processor_count       => <integer>,
-            cpu                   => <integer>,
-            architecture          => <integer>,
-            total_physical_memory => <integer>
-        },
-        request => HTTP::Request->new(
-            POST => 'https://www.null.com',
-            [ 'Content-Type' => 'text/html', ]
-        ),
-    );
+    sub some_post_action {
+        my ( $self, $request ) = @_;
+        eval {
+            # do something with request
+            # ...
+        };
+        if ( my $exception = $@ ) {
 
-    my $message = $message->prepare_raygun;
-    my $raygun = WebService::Raygun::Messenger->new( api_key => '<your raygun.io api key>' );
-    my $response = $raygun->fire_raygun($message);
+            # see WebService::Raygun::Message for details
+            # of request object.
+            my $message = {
+                error   => $exception,
+                request => $request
+                user  => 'null@null.com',
+                client => {
+                    name      => 'something',
+                    version   => 2,
+                    clientUrl => 'www.null.com'
+                },
+            };
+
+            # initialise raygun.io messenger
+            my $raygun = WebService::Raygun::Messenger->new(
+                api_key => '<your raygun.io api key>',
+                message => $message
+            );
+            # send message to raygun.io
+            my $response = $raygun->fire_raygun;
+        }
+    }
+
 
 =head1 DESCRIPTION
 

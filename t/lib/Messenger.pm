@@ -49,7 +49,7 @@ sub t0020_raygun_http_ok_response : Test(2) {
     );
     my $result;
     lives_ok {
-        $result = $messenger->fire_raygun( {} );
+        $result = $messenger->fire_raygun;
     }
     'Called Raygun.io';
 
