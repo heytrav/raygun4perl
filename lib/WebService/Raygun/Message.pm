@@ -268,7 +268,8 @@ has occurred_on => (
 
 =head2 error
 
-See L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>
+
+An instance of L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. I am using L<type constraints|Mouse::Util::TypeConstraints> to coerce objects of type L<Moose::Exception|Moose::Exception>, L<Mojo::Exception|Mojo::Exception>, and when possible string stack traces as needed.
 
 =cut
 
