@@ -27,7 +27,7 @@ Send a request to raygun.io.
 =head2 api_key
 
 Your raygun.io API key. By default, this will be whatever is in the
-RAYGUN_API_KEY environment variable.
+C<RAYGUN_API_KEY> environment variable.
 
 =cut
 

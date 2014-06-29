@@ -269,7 +269,7 @@ has occurred_on => (
 =head2 error
 
 
-An instance of L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. I am using L<type constraints|Mouse::Util::TypeConstraints> to coerce objects of type L<Moose::Exception|Moose::Exception>, L<Mojo::Exception|Mojo::Exception>, and when possible string stack traces as needed.
+An instance of L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. The module uses L<Mouse type constraints|Mouse::Util::TypeConstraints> to coerce the argument into a L<stacktrace|WebService::Raygun::Message::Error> object. This is a bit experimental and currently L<Moose::Exception|Moose::Exception>, L<Mojo::Exception|Mojo::Exception> are supported.
 
 =cut
 
