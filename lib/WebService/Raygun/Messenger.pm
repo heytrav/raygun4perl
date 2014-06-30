@@ -37,6 +37,8 @@ use Mozilla::CA;
 use JSON;
 use Mouse::Util::TypeConstraints;
 
+use WebService::Raygun::Message;
+
 subtype 'RaygunMessage' => as 'Object' => where {
     $_->isa('WebService::Raygun::Message');
 };
@@ -48,7 +50,10 @@ coerce 'RaygunMessage' => from 'HashRef' => via {
 has api_key => (
     is       => 'rw',
     isa      => 'Str',
-    required => 1
+    required => 1,
+    default => sub {
+        return $ENV{RAYGUN_API_KEY};
+    }
 );
 
 has api_endpoint => (

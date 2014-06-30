@@ -196,6 +196,8 @@ coerce 'Request' => from 'HttpRequest' => via {
         raw_data     => $chunk,
         query_string => $query_string,
     );
+} => from 'HashRef' => via {
+    return WebService::Raygun::Message::Request->new(%{$_});
 };
 
 coerce 'Environment' => from 'HashRef' => via {
