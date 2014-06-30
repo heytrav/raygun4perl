@@ -44,17 +44,15 @@ subtype 'RaygunMessage' => as 'Object' => where {
 };
 
 coerce 'RaygunMessage' => from 'HashRef' => via {
-    return WebService::Raygun::Message->new( %{$_} );
+    return WebService::Raygun::Message->new(%{$_});
 };
 
 has api_key => (
-    is       => 'rw',
-    isa      => 'Str',
-    required => 1,
+    is      => 'rw',
+    isa     => 'Str',
     default => sub {
         return $ENV{RAYGUN_API_KEY};
-    }
-);
+    });
 
 has api_endpoint => (
     is      => 'ro',
@@ -69,7 +67,7 @@ has user_agent => (
     isa     => 'LWP::UserAgent',
     default => sub {
         return LWP::UserAgent->new(
-            ssl_opts => { SSL_ca_file => Mozilla::CA::SSL_ca_file() } );
+            ssl_opts => { SSL_ca_file => Mozilla::CA::SSL_ca_file() });
     },
 );
 
@@ -87,24 +85,21 @@ Send data to api.raygun.io/entries via a POST request.
 
 sub fire_raygun {
     my $self    = shift;
+    my $api_key = $self->api_key;
+    return unless $api_key;
     my $message = $self->message;
     my $uri     = $self->api_endpoint;
     my $ua      = $self->user_agent;
-    my $api_key = $self->api_key;
     my $json    = JSON->new->allow_nonref;
-    my $jsoned  = $json->pretty->encode( $message->prepare_raygun );
+    my $jsoned  = $json->pretty->encode($message->prepare_raygun);
     ### json : $jsoned
-    my $req     = HTTP::Request->new( POST => $uri );
-    $req->header( 'Content-Type' => 'application/json' );
-    $req->header( 'X-ApiKey'     => $api_key );
+    my $req = HTTP::Request->new(POST => $uri);
+    $req->header('Content-Type' => 'application/json');
+    $req->header('X-ApiKey'     => $api_key);
     $req->content($jsoned);
     ### json message : $jsoned;
     my $response = $ua->request($req);
-
-    #my $response =
-    #$ua->post( $uri, 'X-ApiKey' => $api_key, Content => [ $jsoned ] );
     return $response;
-
 }
 
 1;
