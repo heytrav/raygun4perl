@@ -86,7 +86,6 @@ Send data to api.raygun.io/entries via a POST request.
 sub fire_raygun {
     my $self    = shift;
     my $api_key = $self->api_key;
-    return unless $api_key;
     my $message = $self->message;
     my $uri     = $self->api_endpoint;
     my $ua      = $self->user_agent;
