@@ -132,15 +132,18 @@ subtype 'MojoException' => as 'Object' => where {
     $_->isa('Mojo::Exception');
 };
 
+subtype 'DevelStacktrace' => as 'Object' => where {
+    $_->isa('Devel::StackTrace');
+};
+
 coerce 'OccurredOnDateTime' => from 'Str' => via {
     my $parser = DateTime::Format::Strptime->new(
         pattern   => '%FT%T%z',
         time_zone => 'UTC',
         on_error  => sub {
             confess
-              'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
-        }
-    );
+                'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
+        });
     return $parser->parse_datetime($_);
 };
 
@@ -164,7 +167,7 @@ coerce 'Request' => from 'HttpRequest' => via {
     my $headers      = $_->headers->to_hash;
     my $query_params = $_->query_params;
     my $query_string = '';
-    if ( defined $query_params and $query_params->isa('Mojo::Parameters') ) {
+    if (defined $query_params and $query_params->isa('Mojo::Parameters')) {
         $query_string = $query_params->to_string;
     }
     return WebService::Raygun::Message::Request->new(
@@ -183,7 +186,7 @@ coerce 'Request' => from 'HttpRequest' => via {
         $headers->{$header} = $value;
     }
     my $chunk;
-    $_->read_chunk( \$chunk, 4096 );
+    $_->read_chunk(\$chunk, 4096);
     my $query_string = $_->uri->query || '';
     return WebService::Raygun::Message::Request->new(
         ip_address   => $_->address,
@@ -196,54 +199,49 @@ coerce 'Request' => from 'HttpRequest' => via {
 };
 
 coerce 'Environment' => from 'HashRef' => via {
-    return WebService::Raygun::Message::Environment->new( %{$_} );
+    return WebService::Raygun::Message::Environment->new(%{$_});
 };
 
 coerce 'MessageError' => from 'HashRef' => via {
-    return WebService::Raygun::Message::Error->new( %{$_} );
+    return WebService::Raygun::Message::Error->new(%{$_});
+} => from 'DevelStacktrace' => via {
+    my $stack_trace = __PACKAGE__->_iterate_stack_trace_frames($_);
+    return WebService::Raygun::Message::Error->new(
+        class_name  => (ref $_),
+        stack_trace => $stack_trace,
+    );
 } => from 'MooseException' => via {
     my $trace       = $_->trace;
-    my $stack_trace = [];
-    while ( my $frame = $trace->next_frame ) {
-        push @{$stack_trace},
-          {
-            line_number => $frame->line,
-            class_name  => $frame->package,
-            file_name   => $frame->filename,
-            method_name => $frame->subroutine,
-          };
-    }
+    my $stack_trace = __PACKAGE__->_iterate_stack_trace_frames($trace);
+
     return WebService::Raygun::Message::Error->new(
-        class_name  => ( ref $_ ),
+        class_name  => (ref $_),
         message     => $_->message,
         stack_trace => $stack_trace,
     );
-}
-=> from 'MojoException' => via {
+} => from 'MojoException' => via {
+
     # Very basic for now since I can't find docs on what the frames look like
     # in Mojo::Exception.
     my $stack_trace = [ { line_number => $_->line, } ];
     return WebService::Raygun::Message::Error->new(
-        class_name  => ( ref $_ ),
+        class_name  => (ref $_),
         message     => $_->message,
         stack_trace => $stack_trace,
     );
-}
-=> from 'Str' => via {
-    my $error_text = $_;
+} => from 'Str' => via {
+    my $error_text      = $_;
     my $exception_regex = qr{
         ^\s*(?<message> (?: (?! \sat\s [^\s]+ \s line).)*)
         \sat\s(?<filename> (?: (?! \sline\s\d+).)* )
         \sline\s(?<line>\d+)[^\d]*$
     }xsm;
-    my ($message,$stack_trace);
-    while ($error_text =~ /$exception_regex/g ) {
+    my ($message, $stack_trace);
+    while ($error_text =~ /$exception_regex/g) {
         $message = $+{message} unless $message;
-        push @{$stack_trace},
-          {
+        push @{$stack_trace}, {
             line_number => $+{line},
-            file_name   => $+{filename}
-          };
+            file_name   => $+{filename} };
     }
     return WebService::Raygun::Message::Error->new(
         stack_trace => $stack_trace,
@@ -262,7 +260,7 @@ has occurred_on => (
     isa     => 'OccurredOnDateTime',
     coerce  => 1,
     default => sub {
-        return DateTime->now( time_zone => 'UTC' );
+        return DateTime->now(time_zone => 'UTC');
     },
 );
 
@@ -290,8 +288,7 @@ has user => (
     isa     => 'Str',
     default => sub {
         return $ENV{'RAYGUN_API_USER'} // '';
-    }
-);
+    });
 
 =head2 request
 
@@ -320,8 +317,7 @@ has environment => (
     coerce  => 1,
     default => sub {
         return {};
-    }
-);
+    });
 
 =head2 user_custom_data
 
@@ -415,7 +411,7 @@ sub prepare_raygun {
         pattern   => '%FT%TZ',
         time_zone => 'UTC',
     );
-    my $occurred_on = $formatter->format_datetime( $self->occurred_on );
+    my $occurred_on = $formatter->format_datetime($self->occurred_on);
     my $data        = {
         occurredOn => $occurred_on,
         details    => {
@@ -434,10 +430,29 @@ sub prepare_raygun {
             },
             response => {
                 statusCode => $self->response_status_code,
-            }
-        }
-    };
+            } } };
     return $data;
+}
+
+=head2 _iterate_stack_trace_frames
+
+Iterate over frames in a L<Devel::StackTrace|Devel::StackTrace> like object.
+
+=cut
+
+sub _iterate_stack_trace_frames {
+    my ($self, $trace) = @_;
+    my $stack_trace = [];
+
+    while (my $frame = $trace->next_frame) {
+        push @{$stack_trace}, {
+            line_number => $frame->line,
+            class_name  => $frame->package,
+            file_name   => $frame->filename,
+            method_name => $frame->subroutine,
+            };
+    }
+    return $stack_trace;
 }
 
 =head1 DEPENDENCIES
