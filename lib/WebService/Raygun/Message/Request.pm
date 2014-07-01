@@ -67,7 +67,7 @@ has query_string => (
 
 has raw_data => (
     is     => 'rw',
-    isa    => 'RawData',
+    isa    => 'RawData|Undef',
     coerce => 1
 );
 
