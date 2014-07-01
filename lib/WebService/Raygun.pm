@@ -40,9 +40,10 @@ WebService::Raygun - Connect to the Raygun.io API
     }
 
 
+
 =head1 DESCRIPTION
 
-Interface for the Raygun.io API.
+Interface for the Raygun.io API. This is designed to send string or objects in C<$@> to raygun.io.
 
 
 =head1 SEE ALSO
