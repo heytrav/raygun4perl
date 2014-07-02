@@ -91,17 +91,22 @@ use DateTime;
 use DateTime::Format::Strptime;
 use POSIX ();
 
-use Mouse::Util::TypeConstraints;
 use WebService::Raygun::Message::Error;
 use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::Environment;
 
-subtype 'OccurredOnDateTime' => as 'Object' => where {
-    $_->isa('DateTime');
+use Mouse::Util::TypeConstraints;
+
+subtype 'RaygunMessage' => as 'Object' => where {
+    $_->isa('WebService::Raygun::Message');
 };
 
-subtype 'Environment' => as 'Object' => where {
-    $_->isa('WebService::Raygun::Message::Environment');
+coerce 'RaygunMessage' => from 'HashRef' => via {
+    return WebService::Raygun::Message->new(%{$_});
+};
+
+subtype 'OccurredOnDateTime' => as 'Object' => where {
+    $_->isa('DateTime');
 };
 
 
@@ -116,10 +121,7 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
     return $parser->parse_datetime($_);
 };
 
-
-coerce 'Environment' => from 'HashRef' => via {
-    return WebService::Raygun::Message::Environment->new(%{$_});
-};
+no Mouse::Util::TypeConstraints;
 
 =head2 occurred_on
 

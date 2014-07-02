@@ -34,6 +34,16 @@ use Sys::Info;
 use Sys::Info::OS;
 use POSIX ();
 
+use Mouse::Util::TypeConstraints;
+subtype 'Environment' => as 'Object' => where {
+    $_->isa('WebService::Raygun::Message::Environment');
+};
+
+coerce 'Environment' => from 'HashRef' => via {
+    return WebService::Raygun::Message::Environment->new(%{$_});
+};
+no Mouse::Util::TypeConstraints;
+
 has info => (
     is      => 'ro',
     isa     => 'Sys::Info',

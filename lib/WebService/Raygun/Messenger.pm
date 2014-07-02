@@ -35,17 +35,8 @@ use LWP::UserAgent;
 use URI;
 use Mozilla::CA;
 use JSON;
-use Mouse::Util::TypeConstraints;
 
 use WebService::Raygun::Message;
-
-subtype 'RaygunMessage' => as 'Object' => where {
-    $_->isa('WebService::Raygun::Message');
-};
-
-coerce 'RaygunMessage' => from 'HashRef' => via {
-    return WebService::Raygun::Message->new(%{$_});
-};
 
 has api_key => (
     is      => 'rw',

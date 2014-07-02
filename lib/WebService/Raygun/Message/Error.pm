@@ -37,24 +37,6 @@ subtype 'MessageError' => as 'Object' => where {
     $_->isa('WebService::Raygun::Message::Error');
 };
 
-subtype 'StackTrace' => as 'Object' =>
-  where { $_->isa('WebService::Raygun::Message::Error::StackTrace') };
-
-subtype 'ArrayOfStackTraces' => as 'ArrayRef[StackTrace]' => where {
-    scalar @{$_} >= 1 and defined $_->[0]->line_number;
-} => message {
-    return 'At least one stack trace element is required.';
-};
-
-coerce 'StackTrace' => from 'HashRef' => via {
-    return WebService::Raygun::Message::Error::StackTrace->new( %{$_} );
-};
-coerce 'ArrayOfStackTraces' => from 'ArrayRef[HashRef]' => via {
-    my $array_of_hashes = $_;
-    return [ map { WebService::Raygun::Message::Error::StackTrace->new( %{$_} ) }
-          @{$array_of_hashes} ];
-};
-
 coerce 'MessageError' => from 'HashRef' => via {
     return WebService::Raygun::Message::Error->new(%{$_});
 } => from 'DevelStacktrace' => via {
@@ -100,6 +82,8 @@ coerce 'MessageError' => from 'HashRef' => via {
         message     => $message,
     );
 };
+
+no Mouse::Util::TypeConstraints;
 
 =head2 _parse_exception_line
 
