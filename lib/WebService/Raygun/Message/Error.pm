@@ -22,6 +22,17 @@ You shouldn't need to instantiate this class directly.
 use Mouse::Util::TypeConstraints;
 use WebService::Raygun::Message::Error::StackTrace;
 
+subtype 'MooseException' => as 'Object' => where {
+    $_->isa('Moose::Exception');
+};
+
+subtype 'MojoException' => as 'Object' => where {
+    $_->isa('Mojo::Exception');
+};
+
+subtype 'DevelStacktrace' => as 'Object' => where {
+    $_->isa('Devel::StackTrace');
+};
 subtype 'MessageError' => as 'Object' => where {
     $_->isa('WebService::Raygun::Message::Error');
 };
