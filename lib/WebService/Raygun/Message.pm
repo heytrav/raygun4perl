@@ -96,10 +96,6 @@ use WebService::Raygun::Message::Error;
 use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::Environment;
 
-subtype 'MessageError' => as 'Object' => where {
-    $_->isa('WebService::Raygun::Message::Error');
-};
-
 subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
 };

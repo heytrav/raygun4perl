@@ -22,6 +22,10 @@ You shouldn't need to instantiate this class directly.
 use Mouse::Util::TypeConstraints;
 use WebService::Raygun::Message::Error::StackTrace;
 
+subtype 'MessageError' => as 'Object' => where {
+    $_->isa('WebService::Raygun::Message::Error');
+};
+
 subtype 'StackTrace' => as 'Object' =>
   where { $_->isa('WebService::Raygun::Message::Error::StackTrace') };
 
@@ -39,6 +43,79 @@ coerce 'ArrayOfStackTraces' => from 'ArrayRef[HashRef]' => via {
     return [ map { WebService::Raygun::Message::Error::StackTrace->new( %{$_} ) }
           @{$array_of_hashes} ];
 };
+
+coerce 'MessageError' => from 'HashRef' => via {
+    return WebService::Raygun::Message::Error->new(%{$_});
+} => from 'DevelStacktrace' => via {
+    my $stack_trace = __PACKAGE__->_iterate_stack_trace_frames($_);
+    return WebService::Raygun::Message::Error->new(
+        class_name  => (ref $_),
+        stack_trace => $stack_trace,
+    );
+} => from 'MooseException' => via {
+    my $trace       = $_->trace;
+    my $stack_trace = __PACKAGE__->_iterate_stack_trace_frames($trace);
+
+    return WebService::Raygun::Message::Error->new(
+        class_name  => (ref $_),
+        message     => $_->message,
+        stack_trace => $stack_trace,
+    );
+} => from 'MojoException' => via {
+
+    # Very basic for now since I can't find docs on what the frames look like
+    # in Mojo::Exception.
+    my $stack_trace = [ { line_number => $_->line, } ];
+    return WebService::Raygun::Message::Error->new(
+        class_name  => (ref $_),
+        message     => $_->message,
+        stack_trace => $stack_trace,
+    );
+} => from 'ArrayRef[Str]' => via {
+    my $error_text = join "\n" => @{$_};
+    my ($message, $stack_trace) = @{__PACKAGE__->_parse_exception_line($error_text)};
+
+    return WebService::Raygun::Message::Error->new(
+        stack_trace => $stack_trace,
+        message     => $message,
+    );
+
+} => from 'Str' => via {
+    my $error_text      = $_;
+    my ($message, $stack_trace) = @{__PACKAGE__->_parse_exception_line($error_text)};
+
+    return WebService::Raygun::Message::Error->new(
+        stack_trace => $stack_trace,
+        message     => $message,
+    );
+};
+
+=head2 _parse_exception_line
+
+Parse a text line into bits for a typical error.
+
+=cut
+
+sub _parse_exception_line {
+    my ($self, $error_text) = @_;
+    my $exception_regex = qr{
+        ^\s*(?<message> (?: (?! \sat\s [^\s]+ \s line).)*)
+        \sat\s(?<filename> (?: (?! \sline\s\d+).)* )
+        \sline\s(?<line>\d+)[^\d]*$
+    }xsm;
+    my ($message, $stack_trace);
+    while ($error_text =~ /$exception_regex/g) {
+        $message = $+{message} unless $message;
+        push @{$stack_trace}, {
+            line_number => $+{line},
+            file_name   => $+{filename} };
+    }
+    $message = $error_text unless $message;
+    if (not $stack_trace) {
+        $stack_trace = [ { line_number => 1 } ];
+    }
+    return [$message, $stack_trace];
+}
 
 has inner_error => (
     is      => 'rw',
