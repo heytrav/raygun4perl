@@ -188,6 +188,26 @@ sub prepare_raygun {
     };
 }
 
+=head2 _iterate_stack_trace_frames
+
+Iterate over frames in a L<Devel::StackTrace|Devel::StackTrace> like object.
+
+=cut
+
+sub _iterate_stack_trace_frames {
+    my ($self, $trace) = @_;
+    my $stack_trace = [];
+
+    while (my $frame = $trace->next_frame) {
+        push @{$stack_trace}, {
+            line_number => $frame->line,
+            class_name  => $frame->package,
+            file_name   => $frame->filename,
+            method_name => $frame->subroutine,
+            };
+    }
+    return $stack_trace;
+}
 =head1 DEPENDENCIES
 
 
