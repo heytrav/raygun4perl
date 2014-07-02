@@ -231,8 +231,33 @@ coerce 'MessageError' => from 'HashRef' => via {
         message     => $_->message,
         stack_trace => $stack_trace,
     );
+} => from 'ArrayRef[Str]' => via {
+    my $error_text = join "\n" => @{$_};
+    my ($message, $stack_trace) = @{__PACKAGE__->_parse_exception_line($error_text)};
+
+    return WebService::Raygun::Message::Error->new(
+        stack_trace => $stack_trace,
+        message     => $message,
+    );
+
 } => from 'Str' => via {
     my $error_text      = $_;
+    my ($message, $stack_trace) = @{__PACKAGE__->_parse_exception_line($error_text)};
+
+    return WebService::Raygun::Message::Error->new(
+        stack_trace => $stack_trace,
+        message     => $message,
+    );
+};
+
+=head2 _parse_exception_line
+
+Parse a text line into bits for a typical error.
+
+=cut
+
+sub _parse_exception_line {
+    my ($self, $error_text) = @_;
     my $exception_regex = qr{
         ^\s*(?<message> (?: (?! \sat\s [^\s]+ \s line).)*)
         \sat\s(?<filename> (?: (?! \sline\s\d+).)* )
@@ -245,11 +270,12 @@ coerce 'MessageError' => from 'HashRef' => via {
             line_number => $+{line},
             file_name   => $+{filename} };
     }
-    return WebService::Raygun::Message::Error->new(
-        stack_trace => $stack_trace,
-        message     => $message,
-    );
-};
+    $message = $error_text unless $message;
+    if (not $stack_trace) {
+        $stack_trace = [ { line_number => 1 } ];
+    }
+    return [$message, $stack_trace];
+}
 
 =head2 occurred_on
 
@@ -269,7 +295,12 @@ has occurred_on => (
 =head2 error
 
 
-An instance of L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. The module uses L<Mouse type constraints|Mouse::Util::TypeConstraints> to coerce the argument into a L<stacktrace|WebService::Raygun::Message::Error> object. This is a bit experimental and currently L<Moose::Exception|Moose::Exception>, L<Mojo::Exception|Mojo::Exception> are supported.
+An instance of
+L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. The
+module uses L<Mouse type constraints|Mouse::Util::TypeConstraints> to coerce
+the argument into a L<stacktrace|WebService::Raygun::Message::Error> object.
+This is a bit experimental and currently L<Moose::Exception|Moose::Exception>,
+L<Mojo::Exception|Mojo::Exception> are supported.
 
 =cut
 

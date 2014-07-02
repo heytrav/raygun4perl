@@ -217,6 +217,66 @@ sub t0050_generate_entire_message : Test(1) {
 
 }
 
+sub t0060_error_with_string_only : Test(1) {
+    my $self = shift;
+    my $message;
+    lives_ok {
+        $message = WebService::Raygun::Message->new(
+            client => {
+                name      => 'something',
+                version   => 2,
+                clientUrl => 'www.null.com'
+            },
+            occurred_on => '2014-06-27T03:15:10+1300',
+            error       => "This is my error!",
+            environment => {
+                processor_count       => 2,
+                cpu                   => 34,
+                architecture          => 'x84',
+                total_physical_memory => 3
+            },
+            request => HTTP::Request->new(
+                POST => 'https://www.null.com',
+                [ 'Content-Type' => 'text/html', ]
+            ),
+        );
+
+    }
+    'Instantiated a message with string for error.';
+
+
+}
+
+sub t0070_error_with_array_strings : Test(1) {
+    my $self = shift;
+    my $message;
+    lives_ok {
+        $message = WebService::Raygun::Message->new(
+            client => {
+                name      => 'something',
+                version   => 2,
+                clientUrl => 'www.null.com'
+            },
+            occurred_on => '2014-06-27T03:15:10+1300',
+            error       => ["This is my error!", "Another error!"],
+            environment => {
+                processor_count       => 2,
+                cpu                   => 34,
+                architecture          => 'x84',
+                total_physical_memory => 3
+            },
+            request => HTTP::Request->new(
+                POST => 'https://www.null.com',
+                [ 'Content-Type' => 'text/html', ]
+            ),
+        );
+
+    }
+    'Instantiated a message with an array of strings for error.';
+
+
+}
+
 1;
 
 __END__
