@@ -100,24 +100,8 @@ subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
 };
 
-subtype 'Request' => as 'Object' => where {
-    $_->isa('WebService::Raygun::Message::Request');
-};
-
 subtype 'Environment' => as 'Object' => where {
     $_->isa('WebService::Raygun::Message::Environment');
-};
-
-subtype 'HttpRequest' => as 'Object' => where {
-    $_->isa('HTTP::Request');
-};
-
-subtype 'MojoliciousRequest' => as 'Object' => where {
-    $_->isa('Mojo::Message::Request');
-};
-
-subtype 'CatalystRequest' => as 'Object' => where {
-    $_->isa('Catalyst::Request');
 };
 
 
@@ -132,58 +116,6 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
     return $parser->parse_datetime($_);
 };
 
-coerce 'Request' => from 'HttpRequest' => via {
-    my @header_names = $_->headers->header_field_names;
-    my $headers;
-    foreach my $header (@header_names) {
-        my $value = $_->header($header);
-        $headers->{$header} = $value;
-    }
-    my $query_string = $_->uri->query || '';
-
-    return WebService::Raygun::Message::Request->new(
-        url          => $_->uri->as_string,
-        raw_data     => $_->as_string,
-        headers      => $headers,
-        http_method  => $_->method,
-        query_string => $query_string,
-    );
-} => from 'MojoliciousRequest' => via {
-    my $headers      = $_->headers->to_hash;
-    my $query_params = $_->query_params;
-    my $query_string = '';
-    if (defined $query_params and $query_params->isa('Mojo::Parameters')) {
-        $query_string = $query_params->to_string;
-    }
-    return WebService::Raygun::Message::Request->new(
-        url          => $_->url->to_abs->path,
-        http_method  => $_->method,
-        raw_data     => $_->get_body_chunk,
-        headers      => $headers,
-        query_string => $query_string
-    );
-} => from 'CatalystRequest' => via {
-
-    my @header_names = $_->headers->header_field_names;
-    my $headers;
-    foreach my $header (@header_names) {
-        my $value = $_->header($header);
-        $headers->{$header} = $value;
-    }
-    my $chunk;
-    $_->read_chunk(\$chunk, 4096);
-    my $query_string = $_->uri->query || '';
-    return WebService::Raygun::Message::Request->new(
-        ip_address   => $_->address,
-        headers      => $headers,
-        http_method  => $_->method,
-        host_name    => $_->hostname,
-        raw_data     => $chunk,
-        query_string => $query_string,
-    );
-} => from 'HashRef' => via {
-    return WebService::Raygun::Message::Request->new(%{$_});
-};
 
 coerce 'Environment' => from 'HashRef' => via {
     return WebService::Raygun::Message::Environment->new(%{$_});
