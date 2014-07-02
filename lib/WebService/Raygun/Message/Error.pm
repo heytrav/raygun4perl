@@ -19,9 +19,9 @@ You shouldn't need to instantiate this class directly.
 
 =cut
 
-use Mouse::Util::TypeConstraints;
 use WebService::Raygun::Message::Error::StackTrace;
 
+use Mouse::Util::TypeConstraints;
 subtype 'MooseException' => as 'Object' => where {
     $_->isa('Moose::Exception');
 };
