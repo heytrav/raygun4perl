@@ -2,7 +2,6 @@ package WebService::Raygun::Message::Error;
 
 use Mouse;
 
-
 =head1 NAME
 
 WebService::Raygun::Message::Error - Encapsulate the error part of the raygion.io request.
@@ -36,6 +35,12 @@ subtype 'DevelStacktrace' => as 'Object' => where {
 subtype 'MessageError' => as 'Object' => where {
     $_->isa('WebService::Raygun::Message::Error');
 };
+subtype 'MooseObject' => as 'Object' => where {
+            $_->isa('Moose::Object')
+        and $_->can('message')
+        and $_->can('status_code')
+        and $_->can('reason');
+};
 
 coerce 'MessageError' => from 'HashRef' => via {
     return WebService::Raygun::Message::Error->new(%{$_});
@@ -64,9 +69,23 @@ coerce 'MessageError' => from 'HashRef' => via {
         message     => $_->message,
         stack_trace => $stack_trace,
     );
+} => from 'ArrayRef[MooseObject]' => via {
+    my $error_set = $_;
+    my $message;
+    my $stack_trace = [];
+    foreach my $error (@{$error_set}) {
+        $message = $error->reason . ': ' . $error->reason unless $message;
+        push @{$stack_trace}, { line_number => 0 };
+    }
+    return WebService::Raygun::Message::Error->new(
+        class_name  => 'Moose::Object',
+        message     => $message,
+        stack_trace => $stack_trace,
+    );
 } => from 'ArrayRef[Str]' => via {
     my $error_text = join "\n" => @{$_};
-    my ($message, $stack_trace) = @{__PACKAGE__->_parse_exception_line($error_text)};
+    my ($message, $stack_trace) =
+        @{ __PACKAGE__->_parse_exception_line($error_text) };
 
     return WebService::Raygun::Message::Error->new(
         stack_trace => $stack_trace,
@@ -74,8 +93,9 @@ coerce 'MessageError' => from 'HashRef' => via {
     );
 
 } => from 'Str' => via {
-    my $error_text      = $_;
-    my ($message, $stack_trace) = @{__PACKAGE__->_parse_exception_line($error_text)};
+    my $error_text = $_;
+    my ($message, $stack_trace) =
+        @{ __PACKAGE__->_parse_exception_line($error_text) };
 
     return WebService::Raygun::Message::Error->new(
         stack_trace => $stack_trace,
@@ -109,7 +129,7 @@ sub _parse_exception_line {
     if (not $stack_trace) {
         $stack_trace = [ { line_number => 1 } ];
     }
-    return [$message, $stack_trace];
+    return [ $message, $stack_trace ];
 }
 
 has inner_error => (
@@ -168,8 +188,7 @@ sub prepare_raygun {
         data       => $self->data,
         className  => $self->class_name,
         message    => $self->message,
-        stackTrace => [ map { $_->prepare_raygun } @{ $self->stack_trace } ]
-    };
+        stackTrace => [ map { $_->prepare_raygun } @{ $self->stack_trace } ] };
 }
 
 =head2 _iterate_stack_trace_frames
@@ -192,6 +211,7 @@ sub _iterate_stack_trace_frames {
     }
     return $stack_trace;
 }
+
 =head1 DEPENDENCIES
 
 

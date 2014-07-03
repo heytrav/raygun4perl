@@ -200,7 +200,7 @@ has environment => (
 
 =head2 user_custom_data
 
-
+Some data from the user.
 
 =cut
 
