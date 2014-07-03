@@ -74,11 +74,11 @@ coerce 'MessageError' => from 'HashRef' => via {
     my $message;
     my $stack_trace = [];
     foreach my $error (@{$error_set}) {
-        $message = $error->reason . ': ' . $error->reason unless $message;
-        push @{$stack_trace}, { 
+        $message = $error->reason . ': ' . $error->message unless $message;
+        push @{$stack_trace}, {
             line_number => 0,
-            class_name => 'Moose::Object',
-        };
+            class_name  => 'Moose::Object',
+            };
     }
     return WebService::Raygun::Message::Error->new(
         message     => $message,
