@@ -32,7 +32,7 @@ sub t0010_raygun_http_403_response : Test(2) {
         $result = $messenger->fire_raygun();
     }
     'Called Raygun.io';
-    cmp_ok($result->code, '==', 403, 'Expect a "Bad Request" error.');
+    cmp_ok($result->code, '>=', 403, 'Expect a "Bad Request" error.');
 }
 
 sub t0020_raygun_http_ok_response : Test(2) {
