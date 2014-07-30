@@ -1,5 +1,7 @@
 package WebService::Raygun;
 
+# VERSION
+
 =head1 NAME
 
 WebService::Raygun - Connect to the Raygun.io API
