@@ -4,6 +4,8 @@ package WebService::Raygun;
 
 =head1 NAME
 
+=for HTML <a href="https://travis-ci.org/heytrav/raygun4perl"><img src="https://travis-ci.org/heytrav/raygun4perl.svg?branch=master"></a>
+
 WebService::Raygun - Connect to the Raygun.io API
 
 =head1 SYNOPSIS
