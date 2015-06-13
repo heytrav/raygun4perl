@@ -92,6 +92,9 @@ Constructs the actual message. See this class for a better description of the fi
 
 =cut
 
+use strict;
+use warnings;
+
 1;
 
 __END__

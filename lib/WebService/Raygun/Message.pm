@@ -291,7 +291,7 @@ sub prepare_raygun {
         time_zone => 'UTC',
     );
     my $occurred_on = $formatter->format_datetime($self->occurred_on);
-    my $data        = {
+    my $data = {
         occurredOn => $occurred_on,
         details    => {
             userCustomData => $self->user_custom_data,
@@ -301,6 +301,7 @@ sub prepare_raygun {
             client         => $self->client,
             request        => $self->request->prepare_raygun,
             environment    => $self->environment->prepare_raygun,
+            tags           => $self->tags,
             user           => {
                 identifier => $self->user
             },
@@ -309,7 +310,9 @@ sub prepare_raygun {
             },
             response => {
                 statusCode => $self->response_status_code,
-            } } };
+            }
+        }
+    };
     return $data;
 }
 
