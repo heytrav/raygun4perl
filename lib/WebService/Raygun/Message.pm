@@ -103,7 +103,7 @@ subtype 'RaygunMessage' => as 'Object' => where {
 };
 
 coerce 'RaygunMessage' => from 'HashRef' => via {
-    return WebService::Raygun::Message->new(%{$_});
+    return WebService::Raygun::Message->new( %{$_} );
 };
 
 subtype 'OccurredOnDateTime' => as 'Object' => where {
@@ -116,8 +116,9 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
         time_zone => 'UTC',
         on_error  => sub {
             confess
-                'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
-        });
+              'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
+        }
+    );
     return $parser->parse_datetime($_);
 };
 
@@ -134,7 +135,7 @@ has occurred_on => (
     isa     => 'OccurredOnDateTime',
     coerce  => 1,
     default => sub {
-        return DateTime->now(time_zone => 'UTC');
+        return DateTime->now( time_zone => 'UTC' );
     },
 );
 
@@ -165,7 +166,11 @@ Can be an email address or some other identifier. Note that if an email address 
 has user => (
     is      => 'rw',
     isa     => 'RaygunUser',
-    coerce => 1,
+    coerce  => 1,
+    default => sub {
+        print "Calling default";
+        return {};
+    }
 );
 
 =head2 request
@@ -195,7 +200,8 @@ has environment => (
     coerce  => 1,
     default => sub {
         return {};
-    });
+    }
+);
 
 =head2 user_custom_data
 
@@ -229,23 +235,9 @@ has tags => (
 =cut
 
 has grouping_key => (
-    is	    => 'rw',
-    isa 	=> 'Str',
-    default => '',
-);
-
-
-=head2 client
-
-
-=cut
-
-has client => (
     is      => 'rw',
-    isa     => 'HashRef',
-    default => sub {
-        return {};
-    },
+    isa     => 'Str',
+    default => '',
 );
 
 =head2 version
@@ -288,6 +280,21 @@ has response_status_code => (
     },
 );
 
+=head2 client
+
+
+=cut
+
+sub client {
+    my $self = shift;
+
+    return {
+        name      => 'WebService::Raygun',
+        version   => $self->VERSION,
+        clientUrl => 'https://metacpan.org/pod/WebService::Raygun'
+    };
+}
+
 =head2 prepare_raygun
 
 Converts a Perl hash to JSON.
@@ -300,11 +307,11 @@ sub prepare_raygun {
         pattern   => '%FT%TZ',
         time_zone => 'UTC',
     );
-    my $occurred_on = $formatter->format_datetime($self->occurred_on);
-    my $data = {
+    my $occurred_on = $formatter->format_datetime( $self->occurred_on );
+    my $data        = {
         occurredOn => $occurred_on,
         details    => {
-            groupingKey => $self->grouping_key,
+            groupingKey    => $self->grouping_key,
             userCustomData => $self->user_custom_data,
             machineName    => $self->machine_name,
             error          => $self->error->prepare_raygun,
@@ -313,10 +320,8 @@ sub prepare_raygun {
             request        => $self->request->prepare_raygun,
             environment    => $self->environment->prepare_raygun,
             tags           => $self->tags,
-            user           => {
-                identifier => $self->user
-            },
-            context => {
+            user           => $self->user->prepare_raygun,
+            context        => {
                 identifier => undef
             },
             response => {
@@ -326,7 +331,6 @@ sub prepare_raygun {
     };
     return $data;
 }
-
 
 =head1 DEPENDENCIES
 

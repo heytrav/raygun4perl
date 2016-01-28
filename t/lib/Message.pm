@@ -11,7 +11,7 @@ use Test::Exception;
 
 use HTTP::Request;
 
-#use Smart::Comments;
+use Smart::Comments;
 
 sub prep001_message_available : Test(startup => 1) {
     my $self = shift;
@@ -222,11 +222,6 @@ sub t0060_error_with_string_only : Test(1) {
     my $message;
     lives_ok {
         $message = WebService::Raygun::Message->new(
-            client => {
-                name      => 'something',
-                version   => 2,
-                clientUrl => 'www.null.com'
-            },
             occurred_on => '2014-06-27T03:15:10+1300',
             error       => "This is my error!",
             environment => {
@@ -252,11 +247,7 @@ sub t0070_error_with_array_strings : Test(1) {
     my $message;
     lives_ok {
         $message = WebService::Raygun::Message->new(
-            client => {
-                name      => 'something',
-                version   => 2,
-                clientUrl => 'www.null.com'
-            },
+            user => 'test@email.com',
             occurred_on => '2014-06-27T03:15:10+1300',
             error       => ["This is my error!", "Another error!"],
             environment => {
