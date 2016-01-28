@@ -94,6 +94,7 @@ use POSIX ();
 use WebService::Raygun::Message::Error;
 use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::Environment;
+use WebService::Raygun::Message::User
 
 use Mouse::Util::TypeConstraints;
 
@@ -119,6 +120,11 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
                 'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
         });
     return $parser->parse_datetime($_);
+};
+
+subtype 'RaygunUser' => as 'HashRef' => where {
+    my $ref = ref $_;
+    $ref eq 'HASH';
 };
 
 no Mouse::Util::TypeConstraints;
@@ -225,6 +231,17 @@ has tags => (
     },
 );
 
+=head2 grouping_key 
+
+=cut
+
+has grouping_key => (
+    is	    => 'rw',
+    isa 	=> 'Str',
+    default => '',
+);
+
+
 =head2 client
 
 
@@ -294,6 +311,7 @@ sub prepare_raygun {
     my $data = {
         occurredOn => $occurred_on,
         details    => {
+            groupingKey => $self->grouping_key,
             userCustomData => $self->user_custom_data,
             machineName    => $self->machine_name,
             error          => $self->error->prepare_raygun,
