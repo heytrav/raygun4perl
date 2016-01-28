@@ -94,7 +94,7 @@ use POSIX ();
 use WebService::Raygun::Message::Error;
 use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::Environment;
-use WebService::Raygun::Message::User
+use WebService::Raygun::Message::User;
 
 use Mouse::Util::TypeConstraints;
 
@@ -110,7 +110,6 @@ subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
 };
 
-
 coerce 'OccurredOnDateTime' => from 'Str' => via {
     my $parser = DateTime::Format::Strptime->new(
         pattern   => '%FT%T%z',
@@ -120,11 +119,6 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
                 'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
         });
     return $parser->parse_datetime($_);
-};
-
-subtype 'RaygunUser' => as 'HashRef' => where {
-    my $ref = ref $_;
-    $ref eq 'HASH';
 };
 
 no Mouse::Util::TypeConstraints;
@@ -170,10 +164,9 @@ Can be an email address or some other identifier. Note that if an email address 
 
 has user => (
     is      => 'rw',
-    isa     => 'Str',
-    default => sub {
-        return $ENV{'RAYGUN_API_USER'} // '';
-    });
+    isa     => 'RaygunUser',
+    coerce => 1,
+);
 
 =head2 request
 

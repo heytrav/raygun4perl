@@ -34,13 +34,21 @@ that can be converted directly to JSON.
 
 
 use Mouse::Util::TypeConstraints;
-subtype 'User' => as 'Object' => where {
+subtype 'RaygunUser' => as 'Object' => where {
     $_->isa('WebService::Raygun::Message::User');
 };
 
-coerce 'User' => from 'HashRef' => via {
+coerce 'RaygunUser' => from 'Str' => via =>  {
+    return WebService::Raygun::Message::User->new( email => $_) if $_ =~ /[^@]+\@[^\.]+\..*/;
+    return WebService::Raygun::Message::User->new( identifier => $_);
+} => from 'Int' => via {
+    return WebService::Raygun::Message::User->new(
+        identifier => $_
+    );
+} =>  from 'HashRef' => via {
     return WebService::Raygun::Message::User->new(%{$_});
 };
+
 no Mouse::Util::TypeConstraints;
 
 has identifier => (
