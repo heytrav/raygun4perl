@@ -167,8 +167,8 @@ has user => (
     is      => 'rw',
     isa     => 'RaygunUser',
     coerce  => 1,
+    lazy    => 1,
     default => sub {
-        print "Calling default";
         return {};
     }
 );
