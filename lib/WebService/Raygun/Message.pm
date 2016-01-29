@@ -124,8 +124,9 @@ L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>.
 
 The aforementioned types are converted to this object.
 
-=cut
+=back
 
+=cut
 
 has error => (
     is     => 'rw',
@@ -136,6 +137,8 @@ has error => (
 =head2 user
 
 Accepts any one of the following:
+
+=cut
 
 =over 2
 
@@ -333,8 +336,11 @@ sub prepare_raygun {
 
 =head1 DEPENDENCIES
 
+=cut
 
 =head1 SEE ALSO
+
+=over 2
 
 =item L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>
 
@@ -346,7 +352,6 @@ sub prepare_raygun {
 
 =item L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace>
 
-=over 2
 
 
 =back

@@ -223,6 +223,8 @@ has message => (
 
 =head2 stack_trace
 
+An array of stack traces.
+
 =cut
 
 has stack_trace => (
