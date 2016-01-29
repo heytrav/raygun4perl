@@ -336,6 +336,21 @@ sub prepare_raygun {
 
 =head1 SEE ALSO
 
+=item L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>
+
+
+=item L<WebService::Raygun::Message::Environment|WebService::Raygun::Message::Environment>
+
+=item L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>
+
+
+=item L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace>
+
+=over 2
+
+
+=back
+
 
 =cut
 
