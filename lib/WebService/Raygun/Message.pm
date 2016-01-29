@@ -9,74 +9,26 @@ WebService::Raygun::Message - A message to be sent to raygun.io
 =head1 SYNOPSIS
 
   use WebService::Raygun::Message;
+  my $message = WebService::Raygun::Message->new(
+        occurred_on => '2014-06-27T03:15:10+1300',
+        error       => "This is my error!",
+        environment => {
+            processor_count       => 2,
+            cpu                   => 34,
+            architecture          => 'x84',
+            total_physical_memory => 3
+        },
+        request => HTTP::Request->new(
+            POST => 'https://www.null.com',
+            [ 'Content-Type' => 'text/html', ]
+        ),
+  );
 
 
-  # The Raygun.io API expects something like this:
-  my $data = {
-        'occurredOn' => string, # ISO 8601
-        'details'    => {
-            'machineName' => string,
-            'version'     => string,
-            'client'      => {
-                'name'      => string,
-                'version'   => string,
-                'clientUrl' => string
-            },
-            'error' => {
-                'innerError' => string,
-                'data'       => object,
-                'className'  => string,
-                'message'    => string,
-                'stackTrace' => [
-                    {
-                        'lineNumber' => number,
-                        'className'  => string,
-                        'fileName'   => string,
-                        'methodName' => string,
-                    }
-                ]
-            },
-            'environment' => {
-                'processorCount'          => number,
-                'osVersion'               => string,
-                'windowBoundsWidth'       => number,
-                'windowBoundsHeight'      => number,
-                'resolutionScale'         => string,
-                'currentOrientation'      => string,
-                'cpu'                     => string,
-                'packageVersion'          => string,
-                'architecture'            => string,
-                'totalPhysicalMemory'     => number,
-                'availablePhysicalMemory' => number,
-                'totalVirtualMemory'      => number,
-                'availableVirtualMemory'  => number,
-                'diskSpaceFree'           => array,
-                'deviceName'              => string,
-                'locale'                  => string,
-            },
-            'tags'           => array,
-            'userCustomData' => object,
-            'request'        => {
-                'hostName'    => string,
-                'url'         => string,
-                'httpMethod'  => string,
-                'iPAddress'   => string,
-                'queryString' => object,
-                'form'        => object,
-                'headers'     => object,
-                'rawData'     => object,
-            },
-            'response' => {
-                'statusCode' => number
-            },
-            'user' => {
-                'identifier' => string
-            },
-            'context' => {
-                'identifier' => string
-            }
-        }
-    };
+
+=head1 DESCRIPTION
+
+You generally should not need to create instances of this class
 
 =head1 DESCRIPTION
 
@@ -141,13 +93,18 @@ has occurred_on => (
 
 =head2 error
 
+=over 2
 
-An instance of
-L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. The
-module uses L<Mouse type constraints|Mouse::Util::TypeConstraints> to coerce
-the argument into a L<stacktrace|WebService::Raygun::Message::Error> object.
-This is a bit experimental and currently L<Moose::Exception|Moose::Exception>,
-L<Mojo::Exception|Mojo::Exception> are supported.
+=item * 
+An exception object.
+
+See L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace> for a list of supported exception types.
+
+
+=item *
+L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. 
+
+The aforementioned types are converted to this object.
 
 =cut
 

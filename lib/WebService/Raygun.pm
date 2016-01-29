@@ -53,6 +53,8 @@ Send error data to L<Raygun.io|https://raygun.io>
 
 =item L<WebService::Raygun::Messenger|WebService::Raygun::Messenger>
 
+The entry point to actually I<use> this.
+
 =back
 
 =over 2

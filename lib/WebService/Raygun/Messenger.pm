@@ -62,6 +62,32 @@ has user_agent => (
     },
 );
 
+=head2 message
+
+=over 2
+
+=item *
+C<HASHREF>
+
+    {
+        occurred_on => '2014-06-27T03:15:10+1300',
+        error       => $error_obj,
+        environment => {
+            processor_count       => 2,
+            cpu                   => 34,
+            architecture          => 'x84',
+            total_physical_memory => 3
+        },
+        request => $request_object
+    }
+
+=item *
+L<WebService::Raygun::Message|WebService::Raygun::Message> object. The C<HASHREF> with the structure above will be coerced into this type of object.
+
+=back
+
+=cut
+
 has message => (
     is     => 'rw',
     isa    => 'RaygunMessage',

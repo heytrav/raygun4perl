@@ -12,7 +12,7 @@ WebService::Raygun::Message::Error - Encapsulate the error part of the raygion.i
 
 =head1 DESCRIPTION
 
-You shouldn't need to instantiate this class directly.
+You shouldn't need to instantiate this class directly as L<WebService::Raygun::Message|WebService::Raygun::Message> will automatically coerce a number of different object types into this by default. For a list of the accepted types, see below.
 
 =head1 INTERFACE
 
@@ -160,6 +160,19 @@ has inner_error => (
     },
 );
 
+=head2 data
+
+=over 2
+
+=item *
+C<HASHREF> 
+
+Data for debugging the error.
+
+=back
+
+=cut
+
 has data => (
     is      => 'rw',
     isa     => 'HashRef',
@@ -167,6 +180,13 @@ has data => (
         return {};
     },
 );
+
+
+=head2  class_name
+
+The name of the error.
+
+=cut
 
 has class_name => (
     is      => 'rw',
@@ -176,6 +196,13 @@ has class_name => (
     },
 );
 
+=head2 message
+
+An error message.
+
+
+=cut
+
 has message => (
     is      => 'rw',
     isa     => 'Str',
@@ -183,6 +210,12 @@ has message => (
         return '';
     },
 );
+
+=head2 stack_trace
+
+An exception object.  See L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace> for a list of supported types.
+
+=cut
 
 has stack_trace => (
     is      => 'rw',

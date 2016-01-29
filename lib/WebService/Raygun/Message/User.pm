@@ -1,7 +1,6 @@
 package WebService::Raygun::Message::User;
 
 use Mouse;
-use Data::GUID 'guid_string';
 
 =head1 NAME
 
@@ -33,6 +32,7 @@ that can be converted directly to JSON.
 =cut
 
 
+use Data::GUID 'guid_string';
 use Mouse::Util::TypeConstraints;
 
 subtype 'RaygunUser' => as 'Object' => where {
