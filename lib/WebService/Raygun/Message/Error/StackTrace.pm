@@ -15,20 +15,8 @@ WebService::Raygun::Message::Error::StackTrace - Encapsule the stacktrace in err
 
 =head1 DESCRIPTION
 
-You should not need to instantiate this directly. Objects of the following type will be coerced into this object:
+You should not need to instantiate this directly. It will be created by the L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error> object.
 
-=over 2
-
-
-=item L<Devel::StackTrace|Devel::StackTrace>
-
-=item L<Moose::Exception|Moose::Exception>
-
-=item L<Mojo::Exception|Mojo::Exception>
-
-=back
-
-I may add more in the future.
 
 =head1 INTERFACE
 

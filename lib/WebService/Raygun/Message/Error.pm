@@ -12,7 +12,22 @@ WebService::Raygun::Message::Error - Encapsulate the error part of the raygion.i
 
 =head1 DESCRIPTION
 
-You shouldn't need to instantiate this class directly as L<WebService::Raygun::Message|WebService::Raygun::Message> will automatically coerce a number of different object types into this by default. For a list of the accepted types, see below.
+You shouldn't need to instantiate this class directly as L<WebService::Raygun::Message|WebService::Raygun::Message> will automatically coerce a number of different object types into this by default. At the moment the following types are supported:
+
+=over 2
+
+
+=item L<Devel::StackTrace|Devel::StackTrace>
+
+=item L<Moose::Exception|Moose::Exception>
+
+=item L<Mojo::Exception|Mojo::Exception>
+
+=back
+
+
+I may add more in the future.
+
 
 =head1 INTERFACE
 
@@ -125,11 +140,6 @@ coerce 'MessageError' => from 'HashRef' => via {
 
 no Mouse::Util::TypeConstraints;
 
-=head2 _parse_exception_line
-
-Parse a text line into bits for a typical error.
-
-=cut
 
 sub _parse_exception_line {
     my ($self, $error_text) = @_;
@@ -213,7 +223,7 @@ has message => (
 
 =head2 stack_trace
 
-An exception object.  See L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace> for a list of supported types.
+An array of stack trace objects derived from the exception.
 
 =cut
 
@@ -224,8 +234,6 @@ has stack_trace => (
     default => sub {
         return [];
     },
-
-    # other attributes
 );
 
 =head2 prepare_raygun
@@ -244,12 +252,6 @@ sub prepare_raygun {
         stackTrace => [ map { $_->prepare_raygun } @{ $self->stack_trace } ] };
 }
 
-=head2 _iterate_stack_trace_frames
-
-Iterate over frames in a L<Devel::StackTrace|Devel::StackTrace> like object.
-
-=cut
-
 sub _iterate_stack_trace_frames {
     my ($self, $trace) = @_;
     my $stack_trace = [];
@@ -265,10 +267,7 @@ sub _iterate_stack_trace_frames {
     return $stack_trace;
 }
 
-=head1 DEPENDENCIES
 
-
-=head1 SEE ALSO
 
 =cut
 

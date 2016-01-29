@@ -78,6 +78,19 @@ no Mouse::Util::TypeConstraints;
 
 =head2 occurred_on
 
+=over 2
+
+=item
+C<DateTime|DateTime>
+
+=item 
+C<string>
+
+Should have format C<YYYY-mm-ddTHH:MM:SSz>.
+
+
+=back
+
 Must be a valid datetime with timezone offset; eg 2014-06-30T04:30:30+100. Defaults to current time.
 
 =cut
@@ -95,10 +108,15 @@ has occurred_on => (
 
 =over 2
 
+=item *
+C<string>
+
+This could be the output of a typical L<Carp|Carp> or C<die> stacktrace.
+
 =item * 
 An exception object.
 
-See L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace> for a list of supported exception types.
+See L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error> for a list of supported exception types.
 
 
 =item *
@@ -107,6 +125,7 @@ L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>.
 The aforementioned types are converted to this object.
 
 =cut
+
 
 has error => (
     is     => 'rw',
