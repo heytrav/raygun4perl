@@ -163,11 +163,14 @@ Accepts any one of the following:
 
 =over 2
 
-=item A string containing an email (eg. C<test@test.com>).
+=item *
+A string containing an email (eg. C<test@test.com>).
 
-=item An integer
+=item *
+An integer
 
-=item A C<HASH> (or subhash) of the following:
+=item *
+A C<HASH> (or subhash) of the following:
 
         {
             identifier   => INT,
