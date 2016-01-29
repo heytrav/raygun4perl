@@ -11,7 +11,7 @@ use Test::Exception;
 
 use HTTP::Request;
 
-#use Smart::Comments;
+use Smart::Comments;
 
 sub prep001_message_available : Test(startup => 1) {
     my $self = shift;

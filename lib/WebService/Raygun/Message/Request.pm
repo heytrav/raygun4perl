@@ -1,7 +1,9 @@
 package WebService::Raygun::Message::Request;
 
 use Mouse;
+use WebService::Raygun::Message::QueryString;
 use Mouse::Util::TypeConstraints;
+
 
 =head1 NAME
 
@@ -129,8 +131,9 @@ has ip_address => (
 has query_string => (
     is      => 'rw',
     isa     => 'Str',
+    coerce => 1,
     default => sub {
-        return '';
+        return {};
     }
 );
 
