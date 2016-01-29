@@ -223,8 +223,6 @@ has message => (
 
 =head2 stack_trace
 
-An array of stack trace objects derived from the exception.
-
 =cut
 
 has stack_trace => (
@@ -268,8 +266,6 @@ sub _iterate_stack_trace_frames {
 }
 
 
-
-=cut
 
 1;
 
