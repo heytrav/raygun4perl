@@ -60,15 +60,7 @@ Return the data structure that will be sent to raygun.io
 
 sub prepare_raygun {
     my $self = shift;
-    return {
-        identifier => $self->identifier,
-        isAnonymous => $self->is_anonymous,
-        email => $self->email,
-        fullName => $self->full_name,
-        firstName => $self->first_name,
-        uuid => $self->uuid,
-    };
-
+    return $self->params;
 }
 
 =head1 DEPENDENCIES

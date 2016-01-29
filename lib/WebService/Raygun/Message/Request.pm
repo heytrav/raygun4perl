@@ -1,7 +1,7 @@
 package WebService::Raygun::Message::Request;
 
 use Mouse;
-#use WebService::Raygun::Message::Request::QueryString;
+use WebService::Raygun::Message::Request::QueryString;
 
 
 =head1 NAME
@@ -49,32 +49,30 @@ coerce 'Request' => from 'HttpRequest' => via {
         my $value = $_->header($header);
         $headers->{$header} = $value;
     }
-    my $query = $_->uri->query || '';
+    my $query_string = $_->uri->query || '';
 
     my $ws = WebService::Raygun::Message::Request->new(
         url          => $_->uri->as_string,
         raw_data     => $_->as_string,
         headers      => $headers,
         http_method  => $_->method,
-        query => $query,
+        query_string => $query_string,
     );
-    #$ws->query_string($query_string);
     return $ws;
 } => from 'MojoliciousRequest' => via {
     my $headers      = $_->headers->to_hash;
     my $query_params = $_->query_params;
-    my $query = '';
+    my $query_string = '';
     if (defined $query_params and $query_params->isa('Mojo::Parameters')) {
-        $query = $query_params->to_string;
+        $query_string = $query_params->to_string;
     }
     my $ws = WebService::Raygun::Message::Request->new(
         url          => $_->url->to_abs->path,
         http_method  => $_->method,
         raw_data     => $_->get_body_chunk,
         headers      => $headers,
-        query => $query,
+        query_string => $query_string,
     );
-    #$ws->query_string($query_string);
     return $ws;
 } => from 'CatalystRequest' => via {
 
@@ -86,16 +84,15 @@ coerce 'Request' => from 'HttpRequest' => via {
     }
     my $chunk;
     $_->read_chunk(\$chunk, 4096);
-    my $query = $_->uri->query || '';
+    my $query_string = $_->uri->query || '';
     my $ws = WebService::Raygun::Message::Request->new(
         ip_address   => $_->address,
         headers      => $headers,
         http_method  => $_->method,
         host_name    => $_->hostname,
         raw_data     => $chunk,
-        query => $query
+        query_string => $query_string,
     );
-    #$ws->query_string($query_string);
     return $ws;
 } => from 'HashRef' => via {
     return WebService::Raygun::Message::Request->new(%{$_});
@@ -145,11 +142,6 @@ has query_string => (
     }
 );
 
-has query => (
-    is => 'rw',
-    isa => 'Str',
-);
-
 has raw_data => (
     is     => 'rw',
     isa    => 'RawData|Undef',
@@ -177,7 +169,7 @@ sub prepare_raygun {
         hostName    => $self->host_name,
         url         => $self->url,
         httpMethod  => $self->http_method,
-        queryString => $self->query_string,
+        queryString => $self->query_string->prepare_raygun,
         headers     => $self->headers,
         rawData     => $self->raw_data,
     };

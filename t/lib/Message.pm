@@ -11,7 +11,7 @@ use Test::Exception;
 
 use HTTP::Request;
 
-use Smart::Comments;
+#use Smart::Comments;
 
 sub prep001_message_available : Test(startup => 1) {
     my $self = shift;
@@ -203,7 +203,7 @@ sub t0050_generate_entire_message : Test(1) {
             total_physical_memory => 3
         },
         request => HTTP::Request->new(
-            POST => 'https://www.null.com',
+            GET => 'https://www.null.com?q=Search&time=today&lang=english',
             [ 'Content-Type' => 'text/html', ]
         ),
     );

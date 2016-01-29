@@ -93,6 +93,7 @@ use POSIX ();
 
 use WebService::Raygun::Message::Error;
 use WebService::Raygun::Message::Environment;
+use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::User;
 
 use Mouse::Util::TypeConstraints;
@@ -319,9 +320,6 @@ sub prepare_raygun {
             environment    => $self->environment->prepare_raygun,
             tags           => $self->tags,
             user           => $self->user->prepare_raygun,
-            context        => {
-                identifier => undef
-            },
             response => {
                 statusCode => $self->response_status_code,
             }
