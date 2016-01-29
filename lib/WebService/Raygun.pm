@@ -10,15 +10,17 @@ WebService::Raygun - Connect to the Raygun.io API
 
 =head1 SYNOPSIS
 
+  use Try::Tiny;
   use WebService::Raygun::Messenger;
 
-    sub some_post_action {
+    sub some_code {
         my ( $self, $request ) = @_;
-        eval {
+        try {
             # do something with request
             # ...
-        };
-        if ( my $exception = $@ ) {
+        }
+        catch {
+            my $exception = $_;
 
             # see WebService::Raygun::Message for details
             # of request object.
@@ -26,11 +28,6 @@ WebService::Raygun - Connect to the Raygun.io API
                 error   => $exception,
                 request => $request
                 user  => 'null@null.com',
-                client => {
-                    name      => 'something',
-                    version   => 2,
-                    clientUrl => 'www.null.com'
-                },
             };
 
             # initialise raygun.io messenger
@@ -40,15 +37,15 @@ WebService::Raygun - Connect to the Raygun.io API
             );
             # send message to raygun.io
             my $response = $raygun->fire_raygun;
-        }
+            
+        };
     }
 
 
 
 =head1 DESCRIPTION
 
-Interface for the Raygun.io API. This is designed to send string or objects in C<$@> to raygun.io.
-
+Send error data to L<Raygun.io|https://raygun.io>
 
 =head1 SEE ALSO
 
