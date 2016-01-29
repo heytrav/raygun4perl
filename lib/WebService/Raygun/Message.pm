@@ -159,7 +159,29 @@ has error => (
 
 =head2 user
 
-Can be an email address or some other identifier. Note that if an email address is used, raygun.io will try to find a suitable Gravatar to display in the results.
+Accepts any one of the following:
+
+=over 2
+
+=item A string containing an email (eg. C<test@test.com>).
+
+=item An integer
+
+=item A C<HASH> (or subhash) of the following:
+
+        {
+            identifier   => INT,
+            email        => 'test@test.com',
+            is_anonymous => 1|0|undef,
+            full_name    => 'Firstname Lastname',
+            first_name   => 'Firstname',
+            uuid         => '783491e1-d4a9-46bc-9fde-9b1dd9ef6c6e'
+        }
+
+
+=back
+
+These will all be coerced into HASH above.
 
 =cut
 
@@ -173,6 +195,8 @@ has user => (
 );
 
 =head2 request
+
+Can be an object of type L<HTTP::Request|HTTP::Request>, L<Catalyst::Request|Catalyst::Request>, L<Mojo::Message::Request|Mojo::Message::Request> or a C<HASH>.
 
 See L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>.
 
