@@ -92,7 +92,6 @@ use DateTime::Format::Strptime;
 use POSIX ();
 
 use WebService::Raygun::Message::Error;
-use WebService::Raygun::Message::QueryString;
 use WebService::Raygun::Message::Environment;
 use WebService::Raygun::Message::User;
 
