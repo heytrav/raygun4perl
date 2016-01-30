@@ -40,7 +40,7 @@ subtype 'RaygunUser' => as 'Object' => where {
 };
 
 coerce 'RaygunUser' => from 'Str' => via {
-    return WebService::Raygun::Message::User->new(email => $_) if $_ =~ /[^@]+\@[^\.]+\..*/;
+    return WebService::Raygun::Message::User->new(email => $_, identifier => $_) if $_ =~ /[^@]+\@[^\.]+\..*/;
     return WebService::Raygun::Message::User->new(identifier => $_);
 } => from 'Int' => via {
     return WebService::Raygun::Message::User->new(identifier => "$_");
@@ -49,11 +49,24 @@ coerce 'RaygunUser' => from 'Str' => via {
 };
 no Mouse::Util::TypeConstraints;
 
+=head2 identifier
+
+Something to identify the user.
+
+=cut
+
 has identifier => (
     is      => 'rw',
     isa     => 'Str',
+    required => 1,
     default => '',
 );
+
+=head2 email
+
+Email address of logged in user.
+
+=cut
 
 has email => (
     is      => 'rw',
@@ -61,19 +74,43 @@ has email => (
     default => '',
 );
 
-has is_anonymous =>
-  ( is => 'rw', isa => 'Bool', default => sub { return; } );
+=head2 is_anonymous
 
+Indicates whether or not the user is logged into your app.
+
+=cut
+
+has is_anonymous =>
+  ( is => 'rw', isa => 'Bool', default => sub { return 1; } );
+
+=head2 full_name
+
+User's full name.
+
+=cut
 has full_name => (
     is      => 'rw',
     isa     => 'Str',
     default => ''
 );
+
+=head2 first_name
+
+User's first name.
+
+=cut
+
 has first_name => (
     is      => 'rw',
     isa     => 'Str',
     default => '',
 );
+
+=head2 uuid
+
+Device unique identifier. Useful if sending from mobile device.
+
+=cut
 
 has uuid =>
   ( is => 'rw', isa => 'Str', default => sub { return guid_string; } );
