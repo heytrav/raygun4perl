@@ -78,20 +78,20 @@ no Mouse::Util::TypeConstraints;
 
 =head2 occurred_on
 
+Time the error occurred. This can be either:
+
 =over 2
 
-=item
-C<DateTime|DateTime>
+=item  L<DateTime|DateTime> object
 
-=item 
-C<string>
+=item C<string>
 
 Should have format C<YYYY-mm-ddTHH:MM:SSz>.
 
 
 =back
 
-Must be a valid datetime with timezone offset; eg 2014-06-30T04:30:30+100. Defaults to current time.
+Must be a valid datetime with timezone offset, eg 2014-06-30T04:30:30+100. Defaults to current time.
 
 =cut
 
@@ -106,23 +106,22 @@ has occurred_on => (
 
 =head2 error
 
+The error. Can be one of the following:
+
 =over 2
 
-=item *
-C<string>
+=item C<string>
 
-This could be the output of a typical L<Carp|Carp> or C<die> stacktrace.
+This could be the output of something like L<croak|Carp/croak> or C<die>.
 
-=item * 
-An exception object.
+=item An exception object
 
 See L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error> for a list of supported exception types.
 
 
-=item *
-L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. 
+=item L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error> 
 
-The aforementioned types are converted to this object.
+If possible, the other data types are converted to an instance of this class.
 
 =back
 
@@ -138,18 +137,18 @@ has error => (
 
 Accepts any one of the following:
 
-=cut
 
 =over 2
 
-=item *
+=item C<string>
+
 A string containing an email (eg. C<test@test.com>).
 
-=item *
-An integer
+=item C<integer>
 
-=item *
-A C<HASH> (or subhash) of the following:
+=item C<HASHREF>
+
+Key/values should be a subset of the following:
 
         {
             identifier   => INT,
@@ -160,10 +159,12 @@ A C<HASH> (or subhash) of the following:
             uuid         => '783491e1-d4a9-46bc-9fde-9b1dd9ef6c6e'
         }
 
+All the fields are optional, however if C<uuid> is not supplied, one will be generated automatically. 
+
 
 =back
 
-These will all be coerced into HASH above.
+These will all be coerced into an object of type L<WebService::Raygun::Message::User|WebService::Raygun::Message::User>.
 
 =cut
 

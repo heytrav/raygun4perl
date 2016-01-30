@@ -96,10 +96,11 @@ has user_agent => (
 
 =head2 message
 
+This can be one of the following
+
 =over 2
 
-=item *
-C<HASHREF>
+=item C<HASHREF>
 
     {
         occurred_on => '2014-06-27T03:15:10+1300',
@@ -115,8 +116,9 @@ C<HASHREF>
         request => $request_object
     }
 
-=item *
-L<WebService::Raygun::Message|WebService::Raygun::Message> object. The C<HASHREF> with the structure above will be coerced into this type of object.
+=item  L<WebService::Raygun::Message|WebService::Raygun::Message> 
+
+The C<HASHREF> with the structure above will be coerced into this type of object.
 
 =back
 
