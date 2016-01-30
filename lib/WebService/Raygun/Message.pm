@@ -9,74 +9,26 @@ WebService::Raygun::Message - A message to be sent to raygun.io
 =head1 SYNOPSIS
 
   use WebService::Raygun::Message;
+  my $message = WebService::Raygun::Message->new(
+        occurred_on => '2014-06-27T03:15:10+1300',
+        error       => "This is my error!",
+        environment => {
+            processor_count       => 2,
+            cpu                   => 34,
+            architecture          => 'x84',
+            total_physical_memory => 3
+        },
+        request => HTTP::Request->new(
+            POST => 'https://www.null.com',
+            [ 'Content-Type' => 'text/html', ]
+        ),
+  );
 
 
-  # The Raygun.io API expects something like this:
-  my $data = {
-        'occurredOn' => string, # ISO 8601
-        'details'    => {
-            'machineName' => string,
-            'version'     => string,
-            'client'      => {
-                'name'      => string,
-                'version'   => string,
-                'clientUrl' => string
-            },
-            'error' => {
-                'innerError' => string,
-                'data'       => object,
-                'className'  => string,
-                'message'    => string,
-                'stackTrace' => [
-                    {
-                        'lineNumber' => number,
-                        'className'  => string,
-                        'fileName'   => string,
-                        'methodName' => string,
-                    }
-                ]
-            },
-            'environment' => {
-                'processorCount'          => number,
-                'osVersion'               => string,
-                'windowBoundsWidth'       => number,
-                'windowBoundsHeight'      => number,
-                'resolutionScale'         => string,
-                'currentOrientation'      => string,
-                'cpu'                     => string,
-                'packageVersion'          => string,
-                'architecture'            => string,
-                'totalPhysicalMemory'     => number,
-                'availablePhysicalMemory' => number,
-                'totalVirtualMemory'      => number,
-                'availableVirtualMemory'  => number,
-                'diskSpaceFree'           => array,
-                'deviceName'              => string,
-                'locale'                  => string,
-            },
-            'tags'           => array,
-            'userCustomData' => object,
-            'request'        => {
-                'hostName'    => string,
-                'url'         => string,
-                'httpMethod'  => string,
-                'iPAddress'   => string,
-                'queryString' => object,
-                'form'        => object,
-                'headers'     => object,
-                'rawData'     => object,
-            },
-            'response' => {
-                'statusCode' => number
-            },
-            'user' => {
-                'identifier' => string
-            },
-            'context' => {
-                'identifier' => string
-            }
-        }
-    };
+
+=head1 DESCRIPTION
+
+You generally should not need to create instances of this class
 
 =head1 DESCRIPTION
 
@@ -92,8 +44,9 @@ use DateTime::Format::Strptime;
 use POSIX ();
 
 use WebService::Raygun::Message::Error;
-use WebService::Raygun::Message::Request;
 use WebService::Raygun::Message::Environment;
+use WebService::Raygun::Message::Request;
+use WebService::Raygun::Message::User;
 
 use Mouse::Util::TypeConstraints;
 
@@ -102,13 +55,12 @@ subtype 'RaygunMessage' => as 'Object' => where {
 };
 
 coerce 'RaygunMessage' => from 'HashRef' => via {
-    return WebService::Raygun::Message->new(%{$_});
+    return WebService::Raygun::Message->new( %{$_} );
 };
 
 subtype 'OccurredOnDateTime' => as 'Object' => where {
     $_->isa('DateTime');
 };
-
 
 coerce 'OccurredOnDateTime' => from 'Str' => via {
     my $parser = DateTime::Format::Strptime->new(
@@ -116,14 +68,28 @@ coerce 'OccurredOnDateTime' => from 'Str' => via {
         time_zone => 'UTC',
         on_error  => sub {
             confess
-                'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
-        });
+              'Expect time in the following format: yyyy-mm-ddTHH:MM:SS+HHMM';
+        }
+    );
     return $parser->parse_datetime($_);
 };
 
 no Mouse::Util::TypeConstraints;
 
 =head2 occurred_on
+
+=over 2
+
+=item
+C<DateTime|DateTime>
+
+=item 
+C<string>
+
+Should have format C<YYYY-mm-ddTHH:MM:SSz>.
+
+
+=back
 
 Must be a valid datetime with timezone offset; eg 2014-06-30T04:30:30+100. Defaults to current time.
 
@@ -134,19 +100,31 @@ has occurred_on => (
     isa     => 'OccurredOnDateTime',
     coerce  => 1,
     default => sub {
-        return DateTime->now(time_zone => 'UTC');
+        return DateTime->now( time_zone => 'UTC' );
     },
 );
 
 =head2 error
 
+=over 2
 
-An instance of
-L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. The
-module uses L<Mouse type constraints|Mouse::Util::TypeConstraints> to coerce
-the argument into a L<stacktrace|WebService::Raygun::Message::Error> object.
-This is a bit experimental and currently L<Moose::Exception|Moose::Exception>,
-L<Mojo::Exception|Mojo::Exception> are supported.
+=item *
+C<string>
+
+This could be the output of a typical L<Carp|Carp> or C<die> stacktrace.
+
+=item * 
+An exception object.
+
+See L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error> for a list of supported exception types.
+
+
+=item *
+L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>. 
+
+The aforementioned types are converted to this object.
+
+=back
 
 =cut
 
@@ -158,18 +136,49 @@ has error => (
 
 =head2 user
 
-Can be an email address or some other identifier. Note that if an email address is used, raygun.io will try to find a suitable Gravatar to display in the results.
+Accepts any one of the following:
+
+=cut
+
+=over 2
+
+=item *
+A string containing an email (eg. C<test@test.com>).
+
+=item *
+An integer
+
+=item *
+A C<HASH> (or subhash) of the following:
+
+        {
+            identifier   => INT,
+            email        => 'test@test.com',
+            is_anonymous => 1|0|undef,
+            full_name    => 'Firstname Lastname',
+            first_name   => 'Firstname',
+            uuid         => '783491e1-d4a9-46bc-9fde-9b1dd9ef6c6e'
+        }
+
+
+=back
+
+These will all be coerced into HASH above.
 
 =cut
 
 has user => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => 'RaygunUser',
+    coerce  => 1,
     default => sub {
-        return $ENV{'RAYGUN_API_USER'} // '';
-    });
+        return {};
+    }
+);
 
 =head2 request
+
+Can be an object of type L<HTTP::Request|HTTP::Request>, L<Catalyst::Request|Catalyst::Request>, L<Mojo::Message::Request|Mojo::Message::Request> or a C<HASH>.
 
 See L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>.
 
@@ -196,7 +205,8 @@ has environment => (
     coerce  => 1,
     default => sub {
         return {};
-    });
+    }
+);
 
 =head2 user_custom_data
 
@@ -225,17 +235,14 @@ has tags => (
     },
 );
 
-=head2 client
-
+=head2 grouping_key 
 
 =cut
 
-has client => (
+has grouping_key => (
     is      => 'rw',
-    isa     => 'HashRef',
-    default => sub {
-        return {};
-    },
+    isa     => 'Str',
+    default => '',
 );
 
 =head2 version
@@ -278,6 +285,21 @@ has response_status_code => (
     },
 );
 
+=head2 client
+
+
+=cut
+
+sub client {
+    my $self = shift;
+
+    return {
+        name      => 'WebService::Raygun',
+        version   => $self->VERSION,
+        clientUrl => 'https://metacpan.org/pod/WebService::Raygun'
+    };
+}
+
 =head2 prepare_raygun
 
 Converts a Perl hash to JSON.
@@ -290,10 +312,11 @@ sub prepare_raygun {
         pattern   => '%FT%TZ',
         time_zone => 'UTC',
     );
-    my $occurred_on = $formatter->format_datetime($self->occurred_on);
-    my $data = {
+    my $occurred_on = $formatter->format_datetime( $self->occurred_on );
+    my $data        = {
         occurredOn => $occurred_on,
         details    => {
+            groupingKey    => $self->grouping_key,
             userCustomData => $self->user_custom_data,
             machineName    => $self->machine_name,
             error          => $self->error->prepare_raygun,
@@ -302,12 +325,7 @@ sub prepare_raygun {
             request        => $self->request->prepare_raygun,
             environment    => $self->environment->prepare_raygun,
             tags           => $self->tags,
-            user           => {
-                identifier => $self->user
-            },
-            context => {
-                identifier => undef
-            },
+            user           => $self->user->prepare_raygun,
             response => {
                 statusCode => $self->response_status_code,
             }
@@ -316,11 +334,27 @@ sub prepare_raygun {
     return $data;
 }
 
-
 =head1 DEPENDENCIES
 
+=cut
 
 =head1 SEE ALSO
+
+=over 2
+
+=item L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>
+
+
+=item L<WebService::Raygun::Message::Environment|WebService::Raygun::Message::Environment>
+
+=item L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error>
+
+
+=item L<WebService::Raygun::Message::Error::StackTrace|WebService::Raygun::Message::Error::StackTrace>
+
+
+
+=back
 
 
 =cut

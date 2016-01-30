@@ -10,15 +10,47 @@ WebService::Raygun::Messenger - Communicate with the Raygun.io endpoint.
 
 =head1 SYNOPSIS
 
+  use Try::Tiny;
   use WebService::Raygun::Messenger;
 
-  my $raygun = WebService::Raygun::Messenger->new(api_key => 'your key here');
-  my $response = $raygun->fire_raygun($raygun_message);
-  # $response->status == ?
+    sub some_code {
+
+        try {
+            # Code that throws an exception
+            # ...
+        }
+        catch {
+            my $exception = $_;
+
+            my $message = {
+                error   => $exception,
+                user  => {
+                        email => 'test@test.com',
+                        identifier => 123456,
+                        full_name => 'Test Person',
+                        },
+                #... other params
+            };
+
+            # initialise raygun.io messenger
+            my $raygun = WebService::Raygun::Messenger->new(
+                api_key => '<your raygun.io api key>',
+                message => $message
+            );
+            # send message to raygun.io
+            my $response = $raygun->fire_raygun;
+            
+        };
+    }
+
+
+
 
 =head1 DESCRIPTION
 
-Send a request to raygun.io.
+Send a request to raygun.io. 
+
+L<WebService::Raygun::Messenger|WebService::Raygun::Messenger>, as well as most of the other classes in this package, accepts a C<HASHREF> in the constructor which is then coerced into datatypes that will eventually be sent to Raygun. It is generally not necessary to initialise any of these objects yourself. For the most part, the class hierarchy in this package maps to the API shown on the Raygun L<api docs|https://raygun.io/docs/integrations/api>.
 
 =head1 INTERFACE
 
@@ -62,6 +94,34 @@ has user_agent => (
     },
 );
 
+=head2 message
+
+=over 2
+
+=item *
+C<HASHREF>
+
+    {
+        occurred_on => '2014-06-27T03:15:10+1300',
+        error       => $error_obj,
+        user        => 'test@test.com',
+        environment => {
+            processor_count       => 2,
+            cpu                   => 34,
+            architecture          => 'x84',
+            total_physical_memory => 3
+            ...
+        },
+        request => $request_object
+    }
+
+=item *
+L<WebService::Raygun::Message|WebService::Raygun::Message> object. The C<HASHREF> with the structure above will be coerced into this type of object.
+
+=back
+
+=cut
+
 has message => (
     is     => 'rw',
     isa    => 'RaygunMessage',
@@ -93,5 +153,20 @@ sub fire_raygun {
 }
 
 1;
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item L<WebService::Raygun::Message|WebService::Raygun::Message>
+
+Constructs the actual message. See this class for a better description of the fields available or required for the raygun.io API.
+
+
+=back
+
+
+=cut
 
 __END__

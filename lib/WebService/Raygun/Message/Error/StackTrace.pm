@@ -15,7 +15,7 @@ WebService::Raygun::Message::Error::StackTrace - Encapsule the stacktrace in err
 
 =head1 DESCRIPTION
 
-# longer description...
+You should not need to instantiate this directly. It will be created by the L<WebService::Raygun::Message::Error|WebService::Raygun::Message::Error> object.
 
 
 =head1 INTERFACE

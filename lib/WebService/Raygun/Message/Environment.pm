@@ -40,9 +40,33 @@ subtype 'Environment' => as 'Object' => where {
 };
 
 coerce 'Environment' => from 'HashRef' => via {
-    return WebService::Raygun::Message::Environment->new(%{$_});
+    return WebService::Raygun::Message::Environment->new( %{$_} );
 };
 no Mouse::Util::TypeConstraints;
+
+has browser => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => ''
+);
+
+has browser_name => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => ''
+);
+
+has browser_version => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => ''
+);
+
+has platform => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => ''
+);
 
 has info => (
     is      => 'ro',
@@ -85,9 +109,9 @@ has window_bounds_height =>
   ( is => 'rw', isa => 'Int', default => sub { return 0; } );
 has resolution_scale =>
   ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has current_orientation =>
-  ( is => 'rw', isa => 'Str', default => sub { return ''; } );
-has cpu => (
+has current_orientation => ( is => 'rw', isa => 'Str', default => 'Landscape' );
+has model               => ( is => 'rw', isa => 'Str', default => '' );
+has cpu                 => (
     is      => 'rw',
     isa     => 'Str',
     lazy    => 1,
@@ -140,6 +164,42 @@ has locale => (
     },
 );
 
+has browser_width => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0
+);
+
+has browser_height => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0
+);
+
+has screen_width => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0
+);
+
+has screen_height => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0
+);
+
+has color_depth => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0
+);
+
+has utc_offset => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0
+);
+
 =head2 prepare_raygun
 
 Return the data structure that will be sent to raygun.io
@@ -165,6 +225,16 @@ sub prepare_raygun {
         diskSpaceFree           => $self->disk_space_free,
         deviceName              => $self->device_name,
         locale                  => $self->locale,
+        "browser-Width"         => $self->browser_width,
+        "browser-Height"        => $self->browser_height,
+        "screen-Width"          => $self->screen_width,
+        "screen-Height"         => $self->screen_height,
+        "color-Depth"           => $self->color_depth,
+        "utcOffset"             => $self->utc_offset,
+        browser                 => $self->browser,
+        browserName             => $self->browser_name,
+        "browser-Version"       => $self->browser_version,
+        platform                => $self->platform,
     };
 
 }
