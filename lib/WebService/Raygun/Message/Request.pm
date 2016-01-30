@@ -8,15 +8,32 @@ use WebService::Raygun::Message::Request::QueryString;
 
 WebService::Raygun::Message::Request - Encapsulate the data in a typical HTTP request.
 
+
 =head1 SYNOPSIS
 
-  use WebService::Raygun::Message::Request;
+    sub request_handler {
+        my $c = shift;     
 
-  # synopsis...
+        try {
+                # error code
+            } 
+            catch {
+    
+                my $raygun = WebService::Raygun::Messenger->new(
+                    api_key => '<your raygun.io api key>',
+                    message => {
+                        ...
+                        request => $c->request, # HTTP::Request object
+                        ... 
+                    }
+                );
+                $raygun->fire_raygun;
+        };
+    }
 
 =head1 DESCRIPTION
 
-# longer description...
+You should not need to instantiate this class directly. When creating an instance of L<WebService::Raygun::Messenger|WebService::Raygun::Messenger>, just pass in the I<request> object for your framework. See below for a list of types.
 
 
 =head1 INTERFACE
@@ -36,6 +53,14 @@ subtype 'HttpRequest' => as 'Object' => where {
 
 subtype 'MojoliciousRequest' => as 'Object' => where {
     $_->isa('Mojo::Message::Request');
+};
+
+subtype 'DancerRequest' => as 'Object' => where {
+    $_->isa('Dancer::Request');
+};
+
+subtype 'Dancer2Request' => as 'Object' => where {
+    $_->isa('Dancer2::Core::Request');
 };
 
 subtype 'CatalystRequest' => as 'Object' => where {
@@ -72,6 +97,26 @@ coerce 'Request' => from 'HttpRequest' => via {
         raw_data     => $_->get_body_chunk,
         headers      => $headers,
         query_string => $query_string,
+    );
+    return $ws;
+} => from 'DancerRequest' => via {
+    my $headers      = $_->headers->to_hash;
+    my $ws = WebService::Raygun::Message::Request->new(
+        url          => $_->request_uri,
+        http_method  => $_->method,
+        raw_data     => $_->body(),
+        headers      => $headers,
+        query_string => $_->params,
+    );
+    return $ws;
+} => from 'Dancer2Request' => via {
+    my $headers      = $_->headers->to_hash;
+    my $ws = WebService::Raygun::Message::Request->new(
+        url          => $_->uri_base,
+        http_method  => $_->method,
+        raw_data     => $_->raw_body,
+        headers      => $headers,
+        query_string => $_->query_string,
     );
     return $ws;
 } => from 'CatalystRequest' => via {
@@ -179,6 +224,26 @@ sub prepare_raygun {
 
 
 =head1 SEE ALSO
+
+=over 2
+
+
+=item L<HTTP::Request|HTTP::Request>
+
+
+=item L<Catalyst::Request|Catalyst::Request>
+
+
+=item L<Mojo::Message::Request|Mojo::Message::Request>
+
+
+=item L<Dancer::Request|Dancer::Request>
+
+
+=item L<Dancer2::Core::Request|Dancer2::Core::Request>
+
+
+=back
 
 =cut
 

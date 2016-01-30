@@ -179,9 +179,7 @@ has user => (
 
 =head2 request
 
-Can be an object of type L<HTTP::Request|HTTP::Request>, L<Catalyst::Request|Catalyst::Request>, L<Mojo::Message::Request|Mojo::Message::Request> or a C<HASH>.
-
-See L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request>.
+A I<request> object.  See L<WebService::Raygun::Message::Request|WebService::Raygun::Message::Request> for a list of supported types.
 
 
 =cut
