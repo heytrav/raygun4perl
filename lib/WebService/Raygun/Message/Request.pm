@@ -225,6 +225,9 @@ sub prepare_raygun {
 
 =head1 SEE ALSO
 
+
+Here is the list of supported request types. I haven't experimented with all of them yet, but most of them have similar interfaces and thus I<should> work.
+
 =over 2
 
 
