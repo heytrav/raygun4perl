@@ -10,7 +10,7 @@ WebService::Raygun::Message::User - Represent the I<User> data in a raygun reque
 
     use WebService::Raygun::Message::User;
     my $user = WebService::Raygun::User->new(
-        identifier   => 123456,
+        identifier   => "123456",
         email        => 'test@test.com',
         is_anonymous => undef,
         full_name    => 'Firstname Lastname',
@@ -43,7 +43,7 @@ coerce 'RaygunUser' => from 'Str' => via {
     return WebService::Raygun::Message::User->new(email => $_) if $_ =~ /[^@]+\@[^\.]+\..*/;
     return WebService::Raygun::Message::User->new(identifier => $_);
 } => from 'Int' => via {
-    return WebService::Raygun::Message::User->new(identifier => $_);
+    return WebService::Raygun::Message::User->new(identifier => "$_");
 } =>  from 'HashRef' => via {
     return WebService::Raygun::Message::User->new(%{$_});
 };

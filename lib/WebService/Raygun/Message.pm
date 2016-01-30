@@ -151,7 +151,7 @@ A string containing an email (eg. C<test@test.com>).
 Key/values should be a subset of the following:
 
         {
-            identifier   => INT,
+            identifier   => "someidentifier",
             email        => 'test@test.com',
             is_anonymous => 1|0|undef,
             full_name    => 'Firstname Lastname',
