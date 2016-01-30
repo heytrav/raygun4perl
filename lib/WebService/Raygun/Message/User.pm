@@ -88,6 +88,7 @@ has is_anonymous =>
 User's full name.
 
 =cut
+
 has full_name => (
     is      => 'rw',
     isa     => 'Str',
