@@ -1,5 +1,7 @@
 package WebService::Raygun::Message;
 
+# VERSION
+
 use Mouse;
 
 =head1 NAME
@@ -24,7 +26,7 @@ WebService::Raygun::Message - A message to be sent to raygun.io
         ),
   );
 
-
+  # test stuff
 
 =head1 DESCRIPTION
 
