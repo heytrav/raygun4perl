@@ -286,6 +286,12 @@ Here is the list of supported request types. I haven't experimented with all of 
 =item L<Dancer2::Core::Request|Dancer2::Core::Request>
 
 
+=item L<Plack::Request|Plack::Request>
+
+
+=item L<HTTP::Engine::Request|HTTP::Engine::Request>
+
+
 =back
 
 =cut
