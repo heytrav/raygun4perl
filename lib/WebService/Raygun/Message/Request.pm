@@ -67,6 +67,10 @@ subtype 'PlackRequest' => as 'Object' => where {
     $_->isa('Plack::Request');
 };
 
+subtype 'HttpEngineRequest' => as 'Object' => where {
+    $_->isa('HTTP::Engine::Request');
+};
+
 subtype 'CatalystRequest' => as 'Object' => where {
     $_->isa('Catalyst::Request');
 };
@@ -132,6 +136,27 @@ coerce 'Request' => from 'HttpRequest' => via {
         raw_data     => $_->raw_body,
         headers      => $headers,
         query_string => $_->query_string,
+    );
+    return $ws;
+} => from 'HttpEngineRequest' => via {
+    my $headers      = $_->headers->to_hash;
+    my $ws = WebService::Raygun::Message::Request->new(
+        url          => $_->base,
+        http_method  => $_->method,
+        raw_data     => $_->raw_body,
+        headers      => $headers,
+        query_string => $_->query_parameters,
+    );
+    return $ws;
+} => from 'PlackRequest' => via {
+    my $header_array      = $_->headers->flatten;
+    my $headers = {@{$header_array}};
+    my $ws = WebService::Raygun::Message::Request->new(
+        url          => $_->request_uri,
+        http_method  => $_->method,
+        raw_data     => $_->raw_body,
+        headers      => $headers,
+        query_string => $_->query_parameters,
     );
     return $ws;
 } => from 'CatalystRequest' => via {
