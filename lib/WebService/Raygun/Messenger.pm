@@ -71,11 +71,13 @@ use JSON;
 use WebService::Raygun::Message;
 
 has api_key => (
-    is      => 'rw',
-    isa     => 'Str',
-    default => sub {
+    is       => 'rw',
+    isa      => 'Str',
+    required => 1,
+    default  => sub {
         return $ENV{RAYGUN_API_KEY};
-    });
+    }
+);
 
 has api_endpoint => (
     is      => 'ro',
@@ -90,7 +92,7 @@ has user_agent => (
     isa     => 'LWP::UserAgent',
     default => sub {
         return LWP::UserAgent->new(
-            ssl_opts => { SSL_ca_file => Mozilla::CA::SSL_ca_file() });
+            ssl_opts => { SSL_ca_file => Mozilla::CA::SSL_ca_file() } );
     },
 );
 
@@ -143,19 +145,20 @@ sub fire_raygun {
     my $uri     = $self->api_endpoint;
     my $ua      = $self->user_agent;
     my $json    = JSON->new->allow_nonref;
-    my $jsoned  = $json->pretty->encode($message->prepare_raygun);
+    my $jsoned  = $json->pretty->encode( $message->prepare_raygun );
     ### json : $jsoned
-    my $req = HTTP::Request->new(POST => $uri);
-    $req->header('Content-Type' => 'application/json');
-    $req->header('X-ApiKey'     => $api_key);
+    my $req = HTTP::Request->new( POST => $uri );
+    $req->header( 'Content-Type' => 'application/json' );
+    $req->header( 'X-ApiKey'     => $api_key );
     $req->content($jsoned);
     ### json message : $jsoned;
     my $response = $ua->request($req);
     return $response;
 }
 
-1;
+__PACKAGE__->meta->make_immutable();
 
+1;
 
 =head1 SEE ALSO
 

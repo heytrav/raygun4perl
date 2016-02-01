@@ -130,9 +130,10 @@ If possible, the other data types are converted to an instance of this class.
 =cut
 
 has error => (
-    is     => 'rw',
-    isa    => 'MessageError',
-    coerce => 1,
+    is       => 'rw',
+    isa      => 'MessageError',
+    coerce   => 1,
+    required => 1,
 );
 
 =head2 user
@@ -187,9 +188,10 @@ A I<request> object.  See L<WebService::Raygun::Message::Request|WebService::Ray
 =cut
 
 has request => (
-    is     => 'rw',
-    isa    => 'Request',
-    coerce => 1,
+    is      => 'rw',
+    isa     => 'Request',
+    coerce  => 1,
+    default => sub { return {}; },
 );
 
 =head2 environment
@@ -327,7 +329,7 @@ sub prepare_raygun {
             environment    => $self->environment->prepare_raygun,
             tags           => $self->tags,
             user           => $self->user->prepare_raygun,
-            response => {
+            response       => {
                 statusCode => $self->response_status_code,
             }
         }
@@ -359,6 +361,8 @@ sub prepare_raygun {
 
 
 =cut
+
+__PACKAGE__->meta->make_immutable();
 
 1;
 

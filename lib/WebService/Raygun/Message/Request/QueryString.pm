@@ -70,6 +70,8 @@ sub prepare_raygun {
 
 =cut
 
+__PACKAGE__->meta->make_immutable();
+
 1;
 
 __END__

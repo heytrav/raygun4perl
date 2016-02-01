@@ -269,6 +269,8 @@ sub _iterate_stack_trace_frames {
 
 
 
+__PACKAGE__->meta->make_immutable();
+
 1;
 
 __END__

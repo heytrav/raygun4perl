@@ -296,6 +296,8 @@ Here is the list of supported request types. I haven't experimented with all of 
 
 =cut
 
+__PACKAGE__->meta->make_immutable();
+
 1;
 
 __END__
