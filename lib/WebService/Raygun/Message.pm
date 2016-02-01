@@ -3,6 +3,8 @@ package WebService::Raygun::Message;
 # VERSION
 
 use Mouse;
+use Try::Tiny;
+use Carp 'croak';
 
 =head1 NAME
 
@@ -133,7 +135,10 @@ has error => (
     is       => 'rw',
     isa      => 'MessageError',
     coerce   => 1,
-    required => 1,
+    default => sub {
+        return try {croak "No error object supplied to WebService::Raygun";}
+        catch { return $_; };
+    },
 );
 
 =head2 user
