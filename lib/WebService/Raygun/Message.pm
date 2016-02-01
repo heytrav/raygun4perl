@@ -136,8 +136,10 @@ has error => (
     isa      => 'MessageError',
     coerce   => 1,
     default => sub {
-        return try {croak "No error object supplied to WebService::Raygun";}
-        catch { return $_; };
+        my $exception;
+        try {croak "No error object supplied to WebService::Raygun";}
+        catch { $exception = $_; };
+        return $exception;
     },
 );
 
