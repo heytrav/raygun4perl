@@ -137,8 +137,13 @@ has error => (
     coerce   => 1,
     default => sub {
         my $exception;
-        try {croak "Default error message. If you are seeing this, it means the developer has not passed in an error object.";}
-        catch { $exception = $_; };
+        try {
+            croak "Default error message. If you are seeing this,"
+            ."it means the developer has not passed in an error object.";
+        }
+        catch { 
+            $exception = $_; 
+        };
         return $exception;
     },
 );
