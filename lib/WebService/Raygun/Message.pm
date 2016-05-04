@@ -14,18 +14,8 @@ WebService::Raygun::Message - A message to be sent to raygun.io
 
   use WebService::Raygun::Message;
   my $message = WebService::Raygun::Message->new(
-        occurred_on => '2014-06-27T03:15:10+1300',
-        error       => "This is my error!",
-        environment => {
-            processor_count       => 2,
-            cpu                   => 34,
-            architecture          => 'x84',
-            total_physical_memory => 3
-        },
-        request => HTTP::Request->new(
-            POST => 'https://www.null.com',
-            [ 'Content-Type' => 'text/html', ]
-        ),
+        error       => $error,      # $@ or framework exception 
+        request => $request_object, # i.e. HTTP::Request, Catalyst::Request, etc.
   );
 
   # test stuff
