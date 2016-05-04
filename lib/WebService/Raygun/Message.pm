@@ -14,7 +14,7 @@ WebService::Raygun::Message - A message to be sent to raygun.io
 
   use WebService::Raygun::Message;
   my $message = WebService::Raygun::Message->new(
-        error       => $error,      # $@ or framework exception 
+        error       => $error,      # $@ or framework exception (eg. Moose::Exception)
         request => $request_object, # i.e. HTTP::Request, Catalyst::Request, etc.
   );
 
