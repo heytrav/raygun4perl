@@ -23,8 +23,9 @@ WebService::Raygun::Messenger - Communicate with the Raygun.io endpoint.
             my $exception = $_;
 
             my $message = {
-                error => $error,      # $@ or framework exception (eg. Moose::Exception)
+                error => $exception,        # $@ or framework exception (eg. Moose::Exception)
                 request => $request_object, # i.e. HTTP::Request, Catalyst::Request, etc.
+
                 #... other params
             };
 
