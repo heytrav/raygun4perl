@@ -23,12 +23,8 @@ WebService::Raygun::Messenger - Communicate with the Raygun.io endpoint.
             my $exception = $_;
 
             my $message = {
-                error   => $exception,
-                user  => {
-                        email => 'test@test.com',
-                        identifier => 123456,
-                        full_name => 'Test Person',
-                        },
+                error => $error,      # $@ or framework exception (eg. Moose::Exception)
+                request => $request_object, # i.e. HTTP::Request, Catalyst::Request, etc.
                 #... other params
             };
 
@@ -106,7 +102,7 @@ This can be one of the following
 
     {
         occurred_on => '2014-06-27T03:15:10+1300',
-        error       => $error_obj,
+        error       => $error_obj, # eg. Catalyst::Exception, Moose::Exception
         user        => 'test@test.com',
         environment => {
             processor_count       => 2,
@@ -118,9 +114,11 @@ This can be one of the following
         request => $request_object
     }
 
-=item  L<WebService::Raygun::Message|WebService::Raygun::Message> 
 
-The C<HASHREF> with the structure above will be coerced into this type of object.
+
+=item L<WebService::Raygun::Message|WebService::Raygun::Message> 
+
+The C<HASHREF> with the structure above will be coerced into this type of object. See L<WebService::Raygun::Message|WebService::Raygun::Message> for a more detailed description of this object.
 
 =back
 
