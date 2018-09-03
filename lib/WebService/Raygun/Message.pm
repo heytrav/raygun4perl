@@ -69,6 +69,7 @@ subtype 'OccurredOnDateTime' => as 'Object' => where {
 coerce 'OccurredOnDateTime' => from 'Str' => via {
     my $parser = DateTime::Format::Strptime->new(
         pattern   => '%FT%T%z',
+        strict    => 1,
         time_zone => 'UTC',
         on_error  => sub {
             confess
