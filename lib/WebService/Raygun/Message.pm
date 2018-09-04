@@ -44,7 +44,7 @@ This module assembles a request for raygun.io.
 =cut
 
 use DateTime;
-use DateTime::Format::Strptime;
+use DateTime::Format::Strptime 1.71;
 use POSIX ();
 
 use WebService::Raygun::Message::Error;
