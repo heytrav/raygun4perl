@@ -34,7 +34,7 @@ sub t0010_validate_raygun_occurred_on : Test(3) {
     throws_ok {
         $message =
           WebService::Raygun::Message->new(
-            occurred_on => '2014-06-27T03:15:10+200', );
+            occurred_on => '2014-06-27T03:15:10+2:00', );
     }
     qr{yyyy-mm-ddTHH:MM:SS\+HH},
       'Timestamp in incorrect format throws an error.';
